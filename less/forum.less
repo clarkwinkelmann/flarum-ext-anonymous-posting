@@ -1,0 +1,49 @@
+.ComposerBody-header {
+    .item-anonymous-posting {
+        display: block;
+
+        .Checkbox {
+            margin-bottom: 0;
+        }
+
+        .Checkbox-display, input {
+            // Change vertical alignment of checkbox because the label has 2 lines
+            margin-top: 5px;
+        }
+
+        .AnonymousCheckboxLabel {
+            display: block;
+        }
+
+        .helpText {
+            margin-bottom: 0;
+        }
+    }
+}
+
+@anonymous-original-avatar-size: 64px;
+@anonymous-avatar-size: 32px;
+
+.item-anonymousUser {
+    .PostUser-avatar {
+        float: left;
+        margin-left: calc(-@anonymous-avatar-size - 22px);
+        margin-top: calc(@anonymous-original-avatar-size - @anonymous-avatar-size);
+
+        --size: @anonymous-avatar-size;
+        border: 2px solid var(--body-bg);
+
+        // Hide avatar on smaller screens because we can't replicate the styling of desktop without taking too much space
+        @media @phone {
+            display: none;
+        }
+    }
+
+    // The Flarum style tries to put the badges above the avatar with absolute positioning in this viewport
+    // But since we hid the avatar it just appears above the username. Move it to after the username instead
+    @media (max-width: @screen-tablet-max) {
+        .PostUser-badges {
+            position: static;
+        }
+    }
+}

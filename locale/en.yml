@@ -1,0 +1,24 @@
+clarkwinkelmann-anonymous-posting:
+    admin:
+        permissions:
+            use: Post anonymously
+            reveal: See real authors of anonymous discussions and posts
+            moderate: Anonymize or de-anonimize any discussion or post
+    forum:
+        composerControls:
+            anonymize: Post anonymously
+            anonymizeHelp: Moderators will still know you created this content
+        discussionControls:
+            anonymize: Anonymize
+            anonymizeConfirmation: This will make the discussion author anonymous. The first post must be anonymized separately. Continue?
+            deanonymize: De-anonymize
+            deanonymizeConfirmation: This will make the original author of the discussion public again. Continue?
+        postControls:
+            anonymize: Anonymize
+            firstPostConfirmation: This will make the first post author anonymous. The discussion must be anonymized separately. Continue?
+            deanonymize: De-anonymize
+            deanonymizeConfirmation: This will make the original author of the post public again. Continue?
+    lib:
+        userMeta:
+            initials: "?"
+            username: Anonymous
