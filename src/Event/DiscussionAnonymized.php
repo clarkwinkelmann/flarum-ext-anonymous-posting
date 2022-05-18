@@ -7,8 +7,8 @@ use Flarum\User\User;
 
 class DiscussionAnonymized
 {
-    public $discussion;
-    public $actor;
+    public Discussion $discussion;
+    public User $actor;
 
     public function __construct(Discussion $discussion, User $actor)
     {

@@ -8,7 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class IncludeAnonymousUserRelation
 {
-    protected $prefix = '';
+    protected string $prefix = '';
 
     public function __construct(string $prefix = '')
     {

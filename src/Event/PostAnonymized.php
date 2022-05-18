@@ -7,8 +7,8 @@ use Flarum\User\User;
 
 class PostAnonymized
 {
-    public $post;
-    public $actor;
+    public Post $post;
+    public User $actor;
 
     public function __construct(Post $post, User $actor)
     {
