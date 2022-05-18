@@ -14,12 +14,15 @@ use Flarum\Api\Serializer\BasicDiscussionSerializer;
 use Flarum\Api\Serializer\BasicPostSerializer;
 use Flarum\Api\Serializer\BasicUserSerializer;
 use Flarum\Api\Serializer\ForumSerializer;
+use Flarum\Database\AbstractModel;
 use Flarum\Discussion\Discussion;
 use Flarum\Discussion\Event\Saving as DiscussionSaving;
 use Flarum\Extend;
 use Flarum\Post\Event\Saving as PostSaving;
 use Flarum\Post\Post;
+use Flarum\Settings\Event\Saving as EventSaving;
 use Flarum\User\User;
+use Kilowhat\Formulaire\Submission;
 
 return [
     (new Extend\Frontend('admin'))
@@ -33,19 +36,29 @@ return [
 
     (new Extend\Event())
         ->listen(DiscussionSaving::class, SaveDiscussion::class)
-        ->listen(PostSaving::class, SavePost::class),
+        ->listen(PostSaving::class, SavePost::class)
+        ->listen(EventSaving::class, SaveSettings::class),
 
-    (new Extend\Model(Discussion::class))
-        ->belongsTo('anonymousUser', User::class, 'anonymous_user_id'),
-    (new Extend\Model(Post::class))
-        ->belongsTo('anonymousUser', User::class, 'anonymous_user_id'),
+    ...array_map(function (string $className) {
+        return (new Extend\Model($className))
+            ->belongsTo('anonymousUser', User::class, 'anonymous_user_id')
+            // This relationship doesn't exist in Formulaire extension because it doesn't make much sense to retrieve public data this way
+            // (because it needs to check which forms are visible to the current user first)
+            // But for our use case here we don't care about form visibility or open/close status, so we can just get all of them
+            // Setting it on the post/discussion also saves up one database request by skipping the anonymousUser relationship
+            ->relationship('anonymousUserSubmissions', function (AbstractModel $model) {
+                return $model->hasMany(Submission::class, 'link_id', 'anonymous_user_id')
+                    ->where('link_type', 'users')
+                    ->whereNull('hidden_at');
+            });
+    }, [Discussion::class, Post::class]),
 
     (new Extend\ApiSerializer(BasicDiscussionSerializer::class))
         ->hasOne('anonymousUser', BasicUserSerializer::class)
-        ->attributes(DiscussionAttributes::class),
+        ->attributes(DiscussionAndPostAttributes::class),
     (new Extend\ApiSerializer(BasicPostSerializer::class))
         ->hasOne('anonymousUser', BasicUserSerializer::class)
-        ->attributes(PostAttributes::class),
+        ->attributes(DiscussionAndPostAttributes::class),
     (new Extend\ApiSerializer(ForumSerializer::class))
         ->attributes(ForumAttributes::class),
 

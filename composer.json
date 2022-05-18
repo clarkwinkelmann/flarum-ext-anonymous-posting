@@ -8,6 +8,7 @@
     "type": "flarum-extension",
     "license": "MIT",
     "require": {
+        "php": "^7.4|^8.0",
         "flarum/core": "^1.2",
         "ext-json": "*"
     },
@@ -35,7 +36,10 @@
                 "name": "fas fa-user-secret",
                 "backgroundColor": "#684ba6",
                 "color": "#fff"
-            }
+            },
+            "optional-dependencies": [
+                "kilowhat/flarum-ext-formulaire"
+            ]
         }
     }
 }

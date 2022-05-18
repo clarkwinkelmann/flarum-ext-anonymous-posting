@@ -42,6 +42,19 @@ function extendComposerData(this: DiscussionComposer | ReplyComposer, data: any)
     }
 }
 
+function anonymousAvatar(post: Discussion | Post, className: string = '') {
+    const src = post.attribute('anonymousAvatarUrl');
+
+    if (src) {
+        return m('img.Avatar.Avatar--anonymous' + className, {
+            src,
+            alt: app.translator.trans('clarkwinkelmann-anonymous-posting.lib.userMeta.username'),
+        });
+    }
+
+    return m('span.Avatar.Avatar--anonymous' + className, app.translator.trans('clarkwinkelmann-anonymous-posting.lib.userMeta.initials'));
+}
+
 app.initializers.add('anonymous-posting', () => {
     extend(CommentPost.prototype, 'headerItems', function (items) {
         // @ts-ignore
@@ -52,7 +65,7 @@ app.initializers.add('anonymous-posting', () => {
         }
 
         items.setContent('user', m('.PostUser', m('h3', [
-            m('span.Avatar.Avatar--anonymous.PostUser-avatar', app.translator.trans('clarkwinkelmann-anonymous-posting.lib.userMeta.initials')),
+            anonymousAvatar(post, '.PostUser-avatar'),
             m('span.username', app.translator.trans('clarkwinkelmann-anonymous-posting.lib.userMeta.username')),
         ])));
 
@@ -118,7 +131,7 @@ app.initializers.add('anonymous-posting', () => {
                     }
 
                     vdom.children = [
-                        m('span.Avatar.Avatar--anonymous', app.translator.trans('clarkwinkelmann-anonymous-posting.lib.userMeta.initials')),
+                        anonymousAvatar(discussion),
                     ];
                 });
             });

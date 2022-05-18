@@ -15,7 +15,34 @@ Instead, you should first de-anonymize the post before changing the author.
 
 ## Installation
 
+This extension requires PHP 7.4 or higher.
+
     composer require clarkwinkelmann/flarum-ext-anonymous-posting
+
+## Anonymous Avatars
+
+The anonymous avatars feature allows customizing the avatar of anonymous posts based on attributes of the real author's profile.
+
+This feature requires the premium [Formulaire extension](https://kilowhat.net/flarum/extensions/formulaire) which can be purchased via [Extiverse](https://extiverse.com/extension/kilowhat/flarum-ext-formulaire).
+
+The feature maps Formulaire field values to custom avatar URLs.
+If multiple of the conditions match, the first one will be used.
+
+Each condition consists of:
+
+- **Form ID**: the Formulaire profile form ID. You can enter the database ID, the public UID or the public slug. The value will be converted to ID during save.
+- **Field Key**: the unique ID of the field inside the form. This value can be found/modified via "Expert Mode" in Formulaire.
+- **Field Value**: the value of the field to check against. Exact matches only. For "Date", the format is YYYY-MM-DD. For "Checkboxes", "Radio" and "Dropdown" fields, this is the hidden option ID that can be found/modified via "Expert Mode".
+- **Avatar URL**: a value to be applied to the image's `src` attribute. Example: `https://cdn.example.com/image.png` or `/assets/anonymous-avatars/image.png`.
+
+"Upload" and "Multi-select" fields cannot be used in conditions.
+
+In fields that accept multiple answers, each answer will be evaluated separately.
+There is no way to check for a combination of answers being selected together.
+
+I recommend setting manual fields and options keys via "Expert Mode" to every field used by this feature, as it makes the settings a lot more readable.
+But do not change keys on a form that already has answers!
+See [Warnings](https://kilowhat.net/flarum/extensions/formulaire#warnings) in Formulaire documentation.
 
 ## Support
 

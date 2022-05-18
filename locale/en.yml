@@ -1,5 +1,16 @@
 clarkwinkelmann-anonymous-posting:
     admin:
+        settings:
+            avatars: Anonymous avatars
+            avatarsHelp: >
+                This feature requires the premium <a>Formulaire extension</a>.
+                Using this feature incurs a small performance impact as additional database requests are required to retrieve discussions and posts.
+                See README for more details on the format for each input.
+            avatarFormId: Form ID
+            avatarFieldKey: Field key
+            avatarFieldValue: Field value
+            avatarAvatarUrl: Avatar URL
+            avatarAdd: Add avatar rule
         permissions:
             use: Post anonymously
             reveal: See real authors of anonymous discussions and posts
