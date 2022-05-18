@@ -10,6 +10,7 @@ import Tooltip from 'flarum/common/components/Tooltip';
 import Model from 'flarum/common/Model';
 import Discussion from 'flarum/common/models/Discussion';
 import Post from 'flarum/common/models/Post';
+import Forum from 'flarum/common/models/Forum';
 import User from 'flarum/common/models/User';
 import DiscussionControls from 'flarum/forum/utils/DiscussionControls';
 import PostControls from 'flarum/forum/utils/PostControls';
@@ -19,6 +20,7 @@ import DiscussionComposer from 'flarum/forum/components/DiscussionComposer';
 import ReplyComposer from 'flarum/forum/components/ReplyComposer';
 import PostUser from 'flarum/forum/components/PostUser';
 import DiscussionListItem from 'flarum/forum/components/DiscussionListItem';
+import ReplyPlaceholder from 'flarum/forum/components/ReplyPlaceholder';
 
 function extendComposerHeaderItems(this: DiscussionComposer | ReplyComposer, items: ItemList<any>) {
     if (!app.forum.attribute('canAnonymousPost')) {
@@ -26,9 +28,9 @@ function extendComposerHeaderItems(this: DiscussionComposer | ReplyComposer, ite
     }
 
     items.add('anonymous-posting', Switch.component({
-        state: !!this.isAnonymous,
+        state: !!app.composer.fields!.isAnonymous,
         onchange: (value: boolean) => {
-            this.isAnonymous = value;
+            app.composer.fields!.isAnonymous = value;
         },
     }, m('span.AnonymousCheckboxLabel', [
         app.translator.trans('clarkwinkelmann-anonymous-posting.forum.composerControls.anonymize'),
@@ -37,12 +39,38 @@ function extendComposerHeaderItems(this: DiscussionComposer | ReplyComposer, ite
 }
 
 function extendComposerData(this: DiscussionComposer | ReplyComposer, data: any) {
-    if (this.isAnonymous) {
+    if (app.composer.fields!.isAnonymous) {
         data.isAnonymous = true;
     }
 }
 
-function anonymousAvatar(post: Discussion | Post, className: string = '') {
+function extendComposerView(this: DiscussionComposer | ReplyComposer, vdom: any) {
+    if (!app.composer.fields!.isAnonymous) {
+        return;
+    }
+
+    if (!vdom || !Array.isArray(vdom.children)) {
+        return;
+    }
+
+    // Loop through <ConfirmDocumentUnload> children
+    vdom.children.forEach(vdom => {
+        if (!vdom || !Array.isArray(vdom.children)) {
+            return;
+        }
+
+        // Loop through .ComposerBody children
+        vdom.children.forEach((child, index) => {
+            if (!child || !child.attrs || !child.attrs.className || child.attrs.className.indexOf('ComposerBody-avatar') === -1) {
+                return;
+            }
+
+            vdom.children[index] = anonymousAvatar(app.forum, '.ComposerBody-avatar');
+        });
+    });
+}
+
+function anonymousAvatar(post: Discussion | Post | Forum, className: string = '') {
     const src = post.attribute('anonymousAvatarUrl');
 
     if (src) {
@@ -102,6 +130,59 @@ app.initializers.add('anonymous-posting', () => {
         );
     });
 
+    extend(ReplyPlaceholder.prototype, 'view', function (vdom0) {
+        if (!app.composer.fields!.isAnonymous) {
+            return;
+        }
+
+        if (!vdom0 || !Array.isArray(vdom0.children)) {
+            return;
+        }
+
+        // Loop through .Post children
+        vdom0.children.forEach(vdom1 => {
+            if (!vdom1 || !Array.isArray(vdom1.children)) {
+                return;
+            }
+
+            // Loop through .Post-header children
+            vdom1.children.forEach((vdom2) => {
+                if (!vdom2 || !Array.isArray(vdom2.children)) {
+                    return;
+                }
+
+                // Loop through .PostUser children
+                vdom2.children.forEach((vdom3, index3) => {
+                    if (!vdom3 || !Array.isArray(vdom3.children)) {
+                        return;
+                    }
+
+                    // Loop through <h3> children
+                    vdom3.children.forEach((child, index) => {
+                        if (!child || !child.attrs || !child.attrs.className) {
+                            return;
+                        }
+
+                        // Replace preview avatar
+                        if (child.attrs.className.indexOf('PostUser-avatar') !== -1) {
+                            vdom3.children[index] = anonymousAvatar(app.forum, '.PostUser-avatar');
+                        }
+
+                        // Replace preview username
+                        if (child.attrs.className === 'username') {
+                            child.text = app.translator.trans('clarkwinkelmann-anonymous-posting.lib.userMeta.username');
+                        }
+                    });
+
+                    // Remove ul.PostUser-badges which would show the actor's badges
+                    if (vdom3.attrs && vdom3.attrs.className && vdom3.attrs.className.indexOf('PostUser-badges') !== -1) {
+                        vdom2.children.splice(index3, 1);
+                    }
+                });
+            });
+        });
+    });
+
     extend(DiscussionListItem.prototype, 'view', function (vdom) {
         // @ts-ignore
         const discussion = this.attrs.discussion as Discussion;
@@ -148,8 +229,10 @@ app.initializers.add('anonymous-posting', () => {
 
     extend(DiscussionComposer.prototype, 'headerItems', extendComposerHeaderItems);
     extend(DiscussionComposer.prototype, 'data', extendComposerData);
+    extend(DiscussionComposer.prototype, 'view', extendComposerView);
     extend(ReplyComposer.prototype, 'headerItems', extendComposerHeaderItems);
     extend(ReplyComposer.prototype, 'data', extendComposerData);
+    extend(ReplyComposer.prototype, 'view', extendComposerView);
 
     extend(DiscussionControls, 'moderationControls', function (items, discussion) {
         if (discussion.attribute('canDeAnonymize')) {

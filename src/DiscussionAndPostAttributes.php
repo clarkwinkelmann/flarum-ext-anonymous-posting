@@ -9,7 +9,6 @@ use Flarum\Database\AbstractModel;
 use Flarum\Discussion\Discussion;
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
-use Illuminate\Support\Arr;
 use Kilowhat\Formulaire\Submission;
 
 class DiscussionAndPostAttributes
@@ -47,30 +46,12 @@ class DiscussionAndPostAttributes
         $avatarRules = json_decode($this->settings->get('anonymous-posting.formulaireAvatars'), true);
 
         // Check if the setting has a value first to avoid degrading performance by retrieving a useless relationship
-        if (!$avatarRules) {
+        // Also skip if Formulaire is not installed to avoid 500 error that would block access to the forum
+        if (!$avatarRules || !class_exists(Submission::class)) {
             return null;
         }
 
         // Ideally we'd want to eager load this relationship, but we can't conditionally add to Flarum's eager loader at the moment
-        $submissions = $model->anonymousUserSubmissions->keyBy('form_id');
-
-        foreach ($avatarRules as $rule) {
-            $submission = $submissions->get(Arr::get($rule, 'formId'));
-
-            if (!$submission) {
-                continue;
-            }
-
-            $value = Arr::get($submission->data, Arr::get($rule, 'fieldKey'));
-
-            // Wrap the value into an array, so text-based entries are compared verbatim, while array-based entries are compared entry by entry
-            foreach (Arr::wrap($value) as $valueEntry) {
-                if ($valueEntry === Arr::get($rule, 'fieldValue')) {
-                    return Arr::get($rule, 'avatarUrl');
-                }
-            }
-        }
-
-        return null;
+        return AnonymousAvatar::retrieve($avatarRules, $model->anonymousUserSubmissions);
     }
 }

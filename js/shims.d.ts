@@ -1,13 +1,11 @@
 // For some reason, just importing the original here fixes typing errors in forum/index.ts
-import OriginalDiscussionComposer from 'flarum/forum/components/DiscussionComposer';
+import ComposerState from 'flarum/forum/states/ComposerState';
 
-declare module 'flarum/forum/components/DiscussionComposer' {
-    export default interface DiscussionComposer {
-        isAnonymous?: boolean
-    }
-}
-declare module 'flarum/forum/components/ReplyComposer' {
-    export default interface ReplyComposer {
-        isAnonymous?: boolean
+declare module 'flarum/forum/states/ComposerState' {
+    export default interface ComposerState {
+        fields: {
+            content: any
+            isAnonymous?: boolean
+        } | undefined
     }
 }
