@@ -3,6 +3,7 @@ import {extend, override} from 'flarum/common/extend';
 import humanTime from 'flarum/common/utils/humanTime';
 import extractText from 'flarum/common/utils/extractText';
 import ItemList from 'flarum/common/utils/ItemList';
+import icon from 'flarum/common/helpers/icon';
 import Button from 'flarum/common/components/Button';
 import Link from 'flarum/common/components/Link';
 import Switch from 'flarum/common/components/Switch';
@@ -27,14 +28,23 @@ function extendComposerHeaderItems(this: DiscussionComposer | ReplyComposer, ite
         return;
     }
 
+    const helpText = app.translator.trans('clarkwinkelmann-anonymous-posting.forum.composerControls.anonymizeHelp');
+    const helpTextPosition = app.forum.attribute('anonymousHelpTextPosition');
+
     items.add('anonymous-posting', Switch.component({
+        className: helpTextPosition === 'visible' ? 'AnonymousCheckbox--multiline' : '',
         state: !!app.composer.fields!.isAnonymous,
         onchange: (value: boolean) => {
             app.composer.fields!.isAnonymous = value;
         },
     }, m('span.AnonymousCheckboxLabel', [
         app.translator.trans('clarkwinkelmann-anonymous-posting.forum.composerControls.anonymize'),
-        m('.helpText', app.translator.trans('clarkwinkelmann-anonymous-posting.forum.composerControls.anonymizeHelp')),
+        helpTextPosition === 'tooltip' ? [' ', Tooltip.component({
+            text: helpText,
+        }, icon('fas fa-info-circle', {
+            className: 'AnonymousCheckboxInfo',
+        }))] : null,
+        helpTextPosition === 'visible' ? m('.helpText', helpText) : null,
     ])), -10);
 }
 

@@ -53,6 +53,9 @@ return [
             });
     }, [Discussion::class, Post::class]),
 
+    (new Extend\Settings())
+        ->default('anonymous-posting.composerHelpTextPosition', 'visible'),
+
     (new Extend\ApiSerializer(BasicDiscussionSerializer::class))
         ->hasOne('anonymousUser', BasicUserSerializer::class)
         ->attributes(DiscussionAndPostAttributes::class),

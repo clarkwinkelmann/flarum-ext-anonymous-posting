@@ -15,6 +15,17 @@ interface Avatar {
 app.initializers.add('anonymous-posting', () => {
     app.extensionData
         .for('clarkwinkelmann-anonymous-posting')
+        .registerSetting({
+            setting: 'anonymous-posting.composerHelpTextPosition',
+            label: app.translator.trans(translationPrefix + 'composerHelpTextPosition'),
+            type: 'select',
+            options: {
+                visible: app.translator.trans(translationPrefix + 'composerHelpTextPositionVisible'),
+                tooltip: app.translator.trans(translationPrefix + 'composerHelpTextPositionTooltip'),
+                hidden: app.translator.trans(translationPrefix + 'composerHelpTextPositionHidden'),
+            },
+            default: 'visible',
+        })
         .registerSetting(function (this: ExtensionPage) {
             let avatars: Avatar[];
 

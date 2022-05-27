@@ -6,11 +6,6 @@
             margin-bottom: 0;
         }
 
-        .Checkbox-display, input {
-            // Change vertical alignment of checkbox because the label has 2 lines
-            margin-top: 5px;
-        }
-
         .AnonymousCheckboxLabel {
             display: block;
         }
@@ -19,6 +14,17 @@
             margin-bottom: 0;
         }
     }
+}
+
+.AnonymousCheckbox--multiline {
+    .Checkbox-display, input {
+        // Change vertical alignment of checkbox because the label has 2 lines
+        margin-top: 5px;
+    }
+}
+
+.AnonymousCheckboxInfo {
+    color: @muted-color;
 }
 
 @anonymous-original-avatar-size: 64px;

@@ -1,6 +1,10 @@
 clarkwinkelmann-anonymous-posting:
     admin:
         settings:
+            composerHelpTextPosition: Composer help text position
+            composerHelpTextPositionVisible: Visible (below label)
+            composerHelpTextPositionTooltip: Tooltip (after label)
+            composerHelpTextPositionHidden: Hidden
             avatars: Anonymous avatars
             avatarsHelp: >
                 This feature requires the premium <a>Formulaire extension</a>.
