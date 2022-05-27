@@ -23,6 +23,7 @@ import PostUser from 'flarum/forum/components/PostUser';
 import DiscussionListItem from 'flarum/forum/components/DiscussionListItem';
 import ReplyPlaceholder from 'flarum/forum/components/ReplyPlaceholder';
 import TerminalPost from 'flarum/forum/components/TerminalPost';
+import PostsUserPage from 'flarum/forum/components/PostsUserPage';
 
 function extendComposerHeaderItems(this: DiscussionComposer | ReplyComposer, items: ItemList<any>) {
     if (!app.forum.attribute('canAnonymousPost')) {
@@ -111,6 +112,28 @@ app.initializers.add('anonymous-posting', () => {
         const anonymousUser = Model.hasOne<User>('anonymousUser').call(post);
 
         if (!anonymousUser) {
+            if (!post.attribute('isAnonymousMe')) {
+                return;
+            }
+
+            let className = '.AnonymousPostPrivacyMine';
+            let tooltipText = app.translator.trans('clarkwinkelmann-anonymous-posting.forum.postPrivacy.mineHelp');
+            let labelText = app.translator.trans('clarkwinkelmann-anonymous-posting.forum.postPrivacy.mine');
+
+            if (app.current.matches(PostsUserPage)) {
+                className = '.AnonymousPostPrivacyProfile';
+                tooltipText = app.translator.trans('clarkwinkelmann-anonymous-posting.forum.postPrivacy.profileHelp');
+                labelText = app.translator.trans('clarkwinkelmann-anonymous-posting.forum.postPrivacy.profile');
+            }
+
+            items.add(
+                'anonymousUserPrivacy',
+                Tooltip.component({
+                    text: tooltipText,
+                }, m('span.AnonymousPostPrivacy' + className, labelText)),
+                90 // Just after the original user label
+            );
+
             return;
         }
 

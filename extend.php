@@ -89,4 +89,7 @@ return [
     (new Extend\Policy())
         ->modelPolicy(Discussion::class, Policy\DiscussionPolicy::class)
         ->modelPolicy(Post::class, Policy\PostPolicy::class),
+
+    (new Extend\ServiceProvider())
+        ->register(Provider\FilterServiceProvider::class),
 ];

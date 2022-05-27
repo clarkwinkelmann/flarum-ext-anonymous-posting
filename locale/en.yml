@@ -35,6 +35,11 @@ clarkwinkelmann-anonymous-posting:
             deanonymizeConfirmation: This will make the original author of the post public again. Continue?
         discussionList:
             genericReplyText: Last replied {ago}
+        postPrivacy:
+            mine: Me
+            mineHelp: Only you can see this information
+            profile: Visible only to you
+            profileHelp: Only you can see your anonymous posts on your profile
     lib:
         userMeta:
             initials: "?"

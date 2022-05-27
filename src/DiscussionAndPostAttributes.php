@@ -36,6 +36,7 @@ class DiscussionAndPostAttributes
 
         if ($attributes['isAnonymous']) {
             $attributes['anonymousAvatarUrl'] = $this->avatarUrl($model);
+            $attributes['isAnonymousMe'] = $model->anonymous_user_id === $serializer->getActor()->id;
         }
 
         return $attributes;
