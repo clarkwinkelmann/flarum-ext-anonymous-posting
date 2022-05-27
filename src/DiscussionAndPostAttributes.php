@@ -39,6 +39,11 @@ class DiscussionAndPostAttributes
             $attributes['isAnonymousMe'] = $model->anonymous_user_id === $serializer->getActor()->id;
         }
 
+        // Remove the placeholder user model in case it ends up here, we don't want it in the serializer response
+        if ($model->relationLoaded('user') && $model->user instanceof AnonymousUser) {
+            $model->unsetRelation('user');
+        }
+
         return $attributes;
     }
 

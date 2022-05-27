@@ -18,6 +18,9 @@ use Flarum\Database\AbstractModel;
 use Flarum\Discussion\Discussion;
 use Flarum\Discussion\Event\Saving as DiscussionSaving;
 use Flarum\Extend;
+use Flarum\Post\Event\Posted;
+use Flarum\Post\Event\Restored;
+use Flarum\Post\Event\Revised;
 use Flarum\Post\Event\Saving as PostSaving;
 use Flarum\Post\Post;
 use Flarum\Settings\Event\Saving as EventSaving;
@@ -35,6 +38,9 @@ return [
     new Extend\Locales(__DIR__ . '/locale'),
 
     (new Extend\Event())
+        ->listen(Posted::class, Listener\NotifyMentionWhenVisible::class)
+        ->listen(Restored::class, Listener\NotifyMentionWhenVisible::class)
+        ->listen(Revised::class, Listener\NotifyMentionWhenVisible::class)
         ->listen(DiscussionSaving::class, SaveDiscussion::class)
         ->listen(PostSaving::class, SavePost::class)
         ->listen(EventSaving::class, SaveSettings::class),
