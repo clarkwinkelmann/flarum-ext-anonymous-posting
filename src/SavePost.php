@@ -22,14 +22,14 @@ class SavePost
                 if ($event->post->exists) {
                     $event->actor->assertCan('anonymize', $event->post);
 
-                    $event->post->anonymous_user_id = $event->post->user_id;
+                    $event->post->anonymousUser()->associate($event->post->user_id);
                 } else {
                     $event->actor->assertCan('anonymous-posting.use');
 
-                    $event->post->anonymous_user_id = $event->actor->id;
+                    $event->post->anonymousUser()->associate($event->actor);
                 }
 
-                $event->post->user_id = null;
+                $event->post->user()->dissociate();
 
                 $event->post->raise(new PostAnonymized($event->post, $event->actor));
             } else if ($event->post->exists) {
@@ -39,8 +39,8 @@ class SavePost
 
                 $event->actor->assertCan('deAnonymize', $event->post);
 
-                $event->post->user_id = $event->post->anonymous_user_id;
-                $event->post->anonymous_user_id = null;
+                $event->post->user()->associate($event->post->anonymous_user_id);
+                $event->post->anonymousUser()->dissociate();
 
                 $event->post->raise(new PostDeAnonymized($event->post, $event->actor));
             }
@@ -51,13 +51,13 @@ class SavePost
             $event->post->isDirty('edited_user_id') &&
             $event->post->anonymous_user_id &&
             $event->post->anonymous_user_id === $event->post->edited_user_id) {
-            $event->post->edited_user_id = null;
+            $event->post->editedUser()->dissociate();
         }
         if (
             $event->post->isDirty('hidden_user_id') &&
             $event->post->anonymous_user_id &&
             $event->post->anonymous_user_id === $event->post->hidden_user_id) {
-            $event->post->hidden_user_id = null;
+            $event->post->hiddenUser()->dissociate();
         }
     }
 }

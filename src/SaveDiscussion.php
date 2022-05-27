@@ -22,14 +22,16 @@ class SaveDiscussion
                 if ($event->discussion->exists) {
                     $event->actor->assertCan('anonymize', $event->discussion);
 
-                    $event->discussion->anonymous_user_id = $event->discussion->user_id;
+                    $event->discussion->anonymousUser()->associate($event->discussion->user_id);
                 } else {
                     $event->actor->assertCan('anonymous-posting.use');
 
-                    $event->discussion->anonymous_user_id = $event->actor->id;
+                    $event->discussion->anonymousUser()->associate($event->actor);
                 }
 
-                $event->discussion->user_id = null;
+                // Use dissociate instead of setting user_id to null, that way any loaded relationship is unset,
+                // otherwise it might end up in the serializer output if it was read from another event listener
+                $event->discussion->user()->dissociate();
 
                 $event->discussion->raise(new DiscussionAnonymized($event->discussion, $event->actor));
             } else if ($event->discussion->exists) {
@@ -39,8 +41,8 @@ class SaveDiscussion
 
                 $event->actor->assertCan('deAnonymize', $event->discussion);
 
-                $event->discussion->user_id = $event->discussion->anonymous_user_id;
-                $event->discussion->anonymous_user_id = null;
+                $event->discussion->user()->associate($event->discussion->anonymous_user_id);
+                $event->discussion->anonymousUser()->dissociate();
 
                 $event->discussion->raise(new DiscussionDeAnonymized($event->discussion, $event->actor));
             }
@@ -51,6 +53,7 @@ class SaveDiscussion
             $event->discussion->isDirty('hidden_user_id') &&
             $event->discussion->anonymous_user_id &&
             $event->discussion->anonymous_user_id === $event->discussion->hidden_user_id) {
+            // There are no relationships to unset here because Flarum doesn't have any for hiddenUser
             $event->discussion->hidden_user_id = null;
         }
     }
