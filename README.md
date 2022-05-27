@@ -7,8 +7,14 @@ This extension allows users to create discussions and replies without revealing 
 Moderators can also switch existing discussions and posts between anonymous and regular.
 The discussion and first post must be updated separately!
 
+Anonymous post authors can still edit their posts like if they were regular posts from them.
+Anonymous posts are made visible to moderators and authors on their user profile, but regular users can't see them.
+
 Unfortunately the author of the anonymous content will still be rendered as `[deleted]` by Flarum in some places.
 You can use the [Prominent Post Numbers](https://github.com/clarkwinkelmann/flarum-ext-prominent-post-numbers) extension to switch some of these texts to the post number instead.
+
+Some Flarum notification templates are not able to handle posts without authors and will throw PHP warnings while trying to access properties of `null` objects.
+If you hide PHP warnings output in `php.ini` most notifications should continue to send fine without errors and will just show the raw translation placeholder where a display name is supposed to be.
 
 You should not use the [Author Change](https://github.com/clarkwinkelmann/flarum-ext-author-change) extension on an anonymous post, it can lead to unexpected errors.
 Instead, you should first de-anonymize the post before changing the author.

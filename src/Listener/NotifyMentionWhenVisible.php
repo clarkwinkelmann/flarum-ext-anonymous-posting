@@ -33,9 +33,6 @@ class NotifyMentionWhenVisible
 
         $reply = $event->post;
 
-        // Workaround subject/blade trying to access $reply->user->display_name on the post
-        $reply->setRelation('user', new AnonymousUser());
-
         // Similar logic to Flarum Mention's UpdateMentionsMetadataWhenVisible to dispatch notifications to anonymous posts
         /**
          * @var Post[] $posts
