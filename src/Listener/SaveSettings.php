@@ -1,6 +1,6 @@
 <?php
 
-namespace ClarkWinkelmann\AnonymousPosting;
+namespace ClarkWinkelmann\AnonymousPosting\Listener;
 
 use Flarum\Settings\Event\Saving;
 use Illuminate\Support\Arr;

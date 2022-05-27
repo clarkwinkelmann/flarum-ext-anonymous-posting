@@ -1,6 +1,6 @@
 <?php
 
-namespace ClarkWinkelmann\AnonymousPosting;
+namespace ClarkWinkelmann\AnonymousPosting\Listener;
 
 use ClarkWinkelmann\AnonymousPosting\Event\PostAnonymized;
 use ClarkWinkelmann\AnonymousPosting\Event\PostDeAnonymized;

@@ -41,9 +41,9 @@ return [
         ->listen(Posted::class, Listener\NotifyMentionWhenVisible::class)
         ->listen(Restored::class, Listener\NotifyMentionWhenVisible::class)
         ->listen(Revised::class, Listener\NotifyMentionWhenVisible::class)
-        ->listen(DiscussionSaving::class, SaveDiscussion::class)
-        ->listen(PostSaving::class, SavePost::class)
-        ->listen(EventSaving::class, SaveSettings::class),
+        ->listen(DiscussionSaving::class, Listener\SaveDiscussion::class)
+        ->listen(PostSaving::class, Listener\SavePost::class)
+        ->listen(EventSaving::class, Listener\SaveSettings::class),
 
     ...array_map(function (string $className) {
         return (new Extend\Model($className))
