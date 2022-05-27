@@ -22,6 +22,7 @@ import ReplyComposer from 'flarum/forum/components/ReplyComposer';
 import PostUser from 'flarum/forum/components/PostUser';
 import DiscussionListItem from 'flarum/forum/components/DiscussionListItem';
 import ReplyPlaceholder from 'flarum/forum/components/ReplyPlaceholder';
+import TerminalPost from 'flarum/forum/components/TerminalPost';
 
 function extendComposerHeaderItems(this: DiscussionComposer | ReplyComposer, items: ItemList<any>) {
     if (!app.forum.attribute('canAnonymousPost')) {
@@ -227,6 +228,40 @@ app.initializers.add('anonymous-posting', () => {
                 });
             });
         });
+    });
+
+    override(TerminalPost.prototype, 'view', function (original, ...args) {
+        const discussion = this.attrs.discussion;
+
+        if (this.attrs.lastPost && discussion.replyCount()) {
+            if (discussion.lastPostedUser()) {
+                return original(...args);
+            }
+
+            // Loading discussion.lastPost for the sole purpose of getting post.isAnonymous would be detrimental to performance
+            // Instead we'll replace all "[deleted] replied" texts with a generic message that doesn't include a username
+
+            return m('span', [
+                icon('fas fa-reply'),
+                ' ',
+                app.translator.trans('clarkwinkelmann-anonymous-posting.forum.discussionList.genericReplyText', {
+                    ago: humanTime(discussion.lastPostedAt()),
+                }),
+            ]);
+        }
+
+        if (!discussion.attribute('isAnonymous')) {
+            return original(...args);
+        }
+
+        return m('span', [
+            '', // Keep output the same as original method to maximise compatibility with other extensions
+            ' ',
+            app.translator.trans('core.forum.discussion_list.started_text', {
+                username: m('span.username', app.translator.trans('clarkwinkelmann-anonymous-posting.lib.userMeta.username')),
+                ago: humanTime(discussion.createdAt()),
+            }),
+        ]);
     });
 
     extend(CommentPost.prototype, 'oninit', function () {

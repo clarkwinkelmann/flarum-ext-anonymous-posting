@@ -33,6 +33,8 @@ clarkwinkelmann-anonymous-posting:
             firstPostConfirmation: This will make the first post author anonymous. The discussion must be anonymized separately. Continue?
             deanonymize: De-anonymize
             deanonymizeConfirmation: This will make the original author of the post public again. Continue?
+        discussionList:
+            genericReplyText: Last replied {ago}
     lib:
         userMeta:
             initials: "?"
