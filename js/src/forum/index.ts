@@ -23,6 +23,7 @@ import PostUser from 'flarum/forum/components/PostUser';
 import DiscussionListItem from 'flarum/forum/components/DiscussionListItem';
 import ReplyPlaceholder from 'flarum/forum/components/ReplyPlaceholder';
 import TerminalPost from 'flarum/forum/components/TerminalPost';
+import PostPreview from 'flarum/forum/components/PostPreview';
 import PostsUserPage from 'flarum/forum/components/PostsUserPage';
 
 function extendComposerHeaderItems(this: DiscussionComposer | ReplyComposer, items: ItemList<any>) {
@@ -249,6 +250,24 @@ app.initializers.add('anonymous-posting', () => {
                         anonymousAvatar(discussion),
                     ];
                 });
+            });
+        });
+    });
+
+    extend(PostPreview.prototype, 'view', function (vdom) {
+        if (!this.attrs.post.attribute('isAnonymous')) {
+            return;
+        }
+
+        vdom.children.forEach(preview => {
+            if (!preview || !preview.attrs || !preview.attrs.className || preview.attrs.className.indexOf('PostPreview-content') === -1) {
+                return;
+            }
+
+            preview.children.forEach((child, index) => {
+                if (child && child.attrs && child.attrs.className && child.attrs.className.indexOf('Avatar') === 0) {
+                    preview.children.splice(index, 1, anonymousAvatar(this.attrs.post));
+                }
             });
         });
     });
