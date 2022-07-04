@@ -61,6 +61,8 @@ You can [contact me](https://clarkwinkelmann.com/flarum) to sponsor additional f
 
 Support is offered on a "best effort" basis through the Flarum community thread.
 
+**Sponsors**: [andyli0123](https://andyli.tw/)
+
 ## Links
 
 - [GitHub](https://github.com/clarkwinkelmann/flarum-ext-anonymous-posting)
