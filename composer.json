@@ -21,7 +21,8 @@
         }
     ],
     "support": {
-        "source": "https://github.com/clarkwinkelmann/flarum-ext-anonymous-posting"
+        "source": "https://github.com/clarkwinkelmann/flarum-ext-anonymous-posting",
+        "forum": "https://discuss.flarum.org/d/31151"
     },
     "autoload": {
         "psr-4": {

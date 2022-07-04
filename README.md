@@ -1,6 +1,6 @@
 # Anonymous Posting
 
-[![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/clarkwinkelmann/flarum-ext-anonymous-posting/blob/master/LICENSE.md) [![Latest Stable Version](https://img.shields.io/packagist/v/clarkwinkelmann/flarum-ext-anonymous-posting.svg)](https://packagist.org/packages/clarkwinkelmann/flarum-ext-anonymous-posting) [![Total Downloads](https://img.shields.io/packagist/dt/clarkwinkelmann/flarum-ext-anonymous-posting.svg)](https://packagist.org/packages/clarkwinkelmann/flarum-ext-anonymous-posting) [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.me/clarkwinkelmann)
+[![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/clarkwinkelmann/flarum-ext-anonymous-posting/blob/main/LICENSE.txt) [![Latest Stable Version](https://img.shields.io/packagist/v/clarkwinkelmann/flarum-ext-anonymous-posting.svg)](https://packagist.org/packages/clarkwinkelmann/flarum-ext-anonymous-posting) [![Total Downloads](https://img.shields.io/packagist/dt/clarkwinkelmann/flarum-ext-anonymous-posting.svg)](https://packagist.org/packages/clarkwinkelmann/flarum-ext-anonymous-posting) [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.me/clarkwinkelmann)
 
 This extension allows users to create discussions and replies without revealing their usernames except to moderators.
 
@@ -8,7 +8,7 @@ Moderators can also switch existing discussions and posts between anonymous and 
 The discussion and first post must be updated separately!
 
 Anonymous post authors can still edit their posts like if they were regular posts from them.
-Anonymous posts are made visible to moderators and authors on their user profile, but regular users can't see them.
+Anonymous posts are made visible to moderators and authors on their user profile, but regular users can't see the association.
 
 Unfortunately the author of the anonymous content will still be rendered as `[deleted]` by Flarum in some places.
 You can use the [Prominent Post Numbers](https://github.com/clarkwinkelmann/flarum-ext-prominent-post-numbers) extension to switch some of these texts to the post number instead.
@@ -65,3 +65,4 @@ Support is offered on a "best effort" basis through the Flarum community thread.
 
 - [GitHub](https://github.com/clarkwinkelmann/flarum-ext-anonymous-posting)
 - [Packagist](https://packagist.org/packages/clarkwinkelmann/flarum-ext-anonymous-posting)
+- [Discuss](https://discuss.flarum.org/d/31151)
