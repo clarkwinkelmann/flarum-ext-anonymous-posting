@@ -16,6 +16,9 @@ You can use the [Prominent Post Numbers](https://github.com/clarkwinkelmann/flar
 Some Flarum notification templates are not able to handle posts without authors and will throw PHP warnings while trying to access properties of `null` objects.
 If you hide PHP warnings output in `php.ini` most notifications should continue to send fine without errors and will just show the raw translation placeholder where a display name is supposed to be.
 
+Most notifications should continue working, but the anonymous authors will not get notifications about their anonymous content.
+Only reply notifications have been re-implemented to be forwarded to the anonymous author.
+
 You should not use the [Author Change](https://github.com/clarkwinkelmann/flarum-ext-author-change) extension on an anonymous post, it can lead to unexpected errors.
 Instead, you should first de-anonymize the post before changing the author.
 

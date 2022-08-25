@@ -12,6 +12,9 @@
         "flarum/core": "^1.2",
         "ext-json": "*"
     },
+    "require-dev": {
+        "flarum/mentions": "*"
+    },
     "authors": [
         {
             "name": "Clark Winkelmann",

@@ -2,7 +2,6 @@
 
 namespace ClarkWinkelmann\AnonymousPosting\Listener;
 
-use ClarkWinkelmann\AnonymousPosting\AnonymousUser;
 use Flarum\Extension\ExtensionManager;
 use Flarum\Mentions\Notification\PostMentionedBlueprint;
 use Flarum\Notification\NotificationSyncer;

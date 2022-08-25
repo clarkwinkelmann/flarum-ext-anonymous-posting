@@ -97,6 +97,6 @@ return [
         ->modelPolicy(Post::class, Policy\PostPolicy::class),
 
     (new Extend\ServiceProvider())
-        ->register(Provider\FakeUserRelationServiceProvider::class)
+        ->register(FakeUserRelation\FakeUserRelationServiceProvider::class)
         ->register(Provider\FilterServiceProvider::class),
 ];

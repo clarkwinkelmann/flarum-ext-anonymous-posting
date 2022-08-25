@@ -17,4 +17,10 @@ class AnonymousUser extends Guest
     {
         return resolve('translator')->trans('clarkwinkelmann-anonymous-posting.lib.userMeta.username');
     }
+
+    protected function newRelatedInstance($class)
+    {
+        // Trying to call relationships on the guest/anonymous user results in SQL errors with table names auto-generated from class names and relations
+        throw new \Exception('[anonymous-posting] Eloquent relationship called on AnonymousUser instance. This is not supported. You probably have an incompatible extension.');
+    }
 }
