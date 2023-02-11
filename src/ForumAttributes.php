@@ -29,7 +29,7 @@ class ForumAttributes
             // might have been because of https://github.com/flarum/framework/issues/3438
             $attributes['anonymousHelpTextPosition'] = $this->settings->get('anonymous-posting.composerHelpTextPosition') ?: 'visible';
 
-            $avatarRules = json_decode($this->settings->get('anonymous-posting.formulaireAvatars'), true);
+            $avatarRules = json_decode($this->settings->get('anonymous-posting.formulaireAvatars', '[]'), true);
 
             if (is_array($avatarRules) && class_exists(Submission::class)) {
                 $attributes['anonymousAvatarUrl'] = AnonymousAvatar::retrieve(
