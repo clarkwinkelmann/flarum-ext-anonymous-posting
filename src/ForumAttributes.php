@@ -9,18 +9,22 @@ use Kilowhat\Formulaire\Submission;
 class ForumAttributes
 {
     protected SettingsRepositoryInterface $settings;
+    protected AnonymityRepository $anonymityRepository;
 
-    public function __construct(SettingsRepositoryInterface $settings)
+    public function __construct(SettingsRepositoryInterface $settings, AnonymityRepository $anonymityRepository)
     {
         $this->settings = $settings;
+        $this->anonymityRepository = $anonymityRepository;
     }
 
     public function __invoke(ForumSerializer $serializer): array
     {
-        $attributes = [];
+        $attributes = [
+            'defaultAnonymousPost' => $this->anonymityRepository->defaultValue($serializer->getActor()),
+        ];
 
         if ($serializer->getActor()->hasPermission('anonymous-posting.use')) {
-            $attributes['canAnonymousPost'] = true;
+            $attributes['canAnonymousSwitch'] = true;
             // We should also be able to return this value through Extend\Settings::serializeToForum but it doesn't seem to work
             // might have been because of https://github.com/flarum/framework/issues/3438
             $attributes['anonymousHelpTextPosition'] = $this->settings->get('anonymous-posting.composerHelpTextPosition') ?: 'visible';

@@ -7,6 +7,8 @@ This extension allows users to create discussions and replies without revealing 
 Moderators can also switch existing discussions and posts between anonymous and regular.
 The discussion and first post must be updated separately!
 
+Optionally, you can set all new content to be anonymous by default and the permissions will then control who is allowed to post publicly.
+
 Anonymous post authors can still edit their posts like if they were regular posts from them.
 Anonymous posts are made visible to moderators and authors on their user profile, but regular users can't see the association.
 

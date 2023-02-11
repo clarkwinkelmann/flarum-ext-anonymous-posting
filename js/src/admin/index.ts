@@ -16,8 +16,23 @@ app.initializers.add('anonymous-posting', () => {
     app.extensionData
         .for('clarkwinkelmann-anonymous-posting')
         .registerSetting({
+            setting: 'anonymous-posting.defaultAnonymity',
+            label: app.translator.trans(translationPrefix + 'defaultAnonymity'),
+            type: 'switch',
+        })
+        .registerSetting({
+            setting: 'anonymous-posting.defaultAnonymityWhenAbleToSwitch',
+            type: 'switch',
+            label: app.translator.trans(translationPrefix + 'defaultAnonymityWhenAbleToSwitch'),
+        })
+        .registerSetting({
+            setting: 'anonymous-posting.alwaysAnonymiseEdits',
+            type: 'switch',
+            label: app.translator.trans(translationPrefix + 'alwaysAnonymiseEdits'),
+            help: app.translator.trans(translationPrefix + 'alwaysAnonymiseEditsHelp'),
+        })
+        .registerSetting({
             setting: 'anonymous-posting.composerHelpTextPosition',
-            label: app.translator.trans(translationPrefix + 'composerHelpTextPosition'),
             type: 'select',
             options: {
                 visible: app.translator.trans(translationPrefix + 'composerHelpTextPositionVisible'),
@@ -25,6 +40,8 @@ app.initializers.add('anonymous-posting', () => {
                 hidden: app.translator.trans(translationPrefix + 'composerHelpTextPositionHidden'),
             },
             default: 'visible',
+            label: app.translator.trans(translationPrefix + 'composerHelpTextPosition'),
+            help: app.translator.trans(translationPrefix + 'composerHelpTextPositionHelp'),
         })
         .registerSetting(function (this: ExtensionPage) {
             let avatars: Avatar[];

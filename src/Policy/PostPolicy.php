@@ -10,7 +10,7 @@ use Flarum\User\User;
 
 class PostPolicy extends AbstractPolicy
 {
-    protected $settings;
+    protected SettingsRepositoryInterface $settings;
 
     public function __construct(SettingsRepositoryInterface $settings)
     {

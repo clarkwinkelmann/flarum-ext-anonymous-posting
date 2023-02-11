@@ -26,8 +26,12 @@ import TerminalPost from 'flarum/forum/components/TerminalPost';
 import PostPreview from 'flarum/forum/components/PostPreview';
 import PostsUserPage from 'flarum/forum/components/PostsUserPage';
 
+function extendComposerInit(this: DiscussionComposer | ReplyComposer) {
+    app.composer.fields!.isAnonymous = !!app.forum.attribute('defaultAnonymousPost');
+}
+
 function extendComposerHeaderItems(this: DiscussionComposer | ReplyComposer, items: ItemList<any>) {
-    if (!app.forum.attribute('canAnonymousPost')) {
+    if (!app.forum.attribute('canAnonymousSwitch')) {
         return;
     }
 
@@ -52,9 +56,7 @@ function extendComposerHeaderItems(this: DiscussionComposer | ReplyComposer, ite
 }
 
 function extendComposerData(this: DiscussionComposer | ReplyComposer, data: any) {
-    if (app.composer.fields!.isAnonymous) {
-        data.isAnonymous = true;
-    }
+    data.isAnonymous = !!app.composer.fields!.isAnonymous;
 }
 
 function extendComposerView(this: DiscussionComposer | ReplyComposer, vdom: any) {
@@ -98,8 +100,7 @@ function anonymousAvatar(post: Discussion | Post | Forum, className: string = ''
 
 app.initializers.add('anonymous-posting', () => {
     extend(CommentPost.prototype, 'headerItems', function (items) {
-        // @ts-ignore
-        const post = this.attrs.post as Post;
+        const {post} = this.attrs;
 
         if (!post.attribute('isAnonymous')) {
             return;
@@ -308,15 +309,15 @@ app.initializers.add('anonymous-posting', () => {
 
     extend(CommentPost.prototype, 'oninit', function () {
         this.subtree!.check(() => {
-            // @ts-ignore
-            const post = this.attrs.post as Post;
-            return post.attribute('isAnonymous');
+            return this.attrs.post.attribute('isAnonymous');
         });
     });
 
+    extend(DiscussionComposer.prototype, 'oninit', extendComposerInit);
     extend(DiscussionComposer.prototype, 'headerItems', extendComposerHeaderItems);
     extend(DiscussionComposer.prototype, 'data', extendComposerData);
     extend(DiscussionComposer.prototype, 'view', extendComposerView);
+    extend(ReplyComposer.prototype, 'oninit', extendComposerInit);
     extend(ReplyComposer.prototype, 'headerItems', extendComposerHeaderItems);
     extend(ReplyComposer.prototype, 'data', extendComposerData);
     extend(ReplyComposer.prototype, 'view', extendComposerView);
