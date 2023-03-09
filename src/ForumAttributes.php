@@ -25,11 +25,11 @@ class ForumAttributes
 
         if ($serializer->getActor()->hasPermission('anonymous-posting.use')) {
             $attributes['canAnonymousSwitch'] = true;
-            // We should also be able to return this value through Extend\Settings::serializeToForum but it doesn't seem to work
+            // We should also be able to return this value through Extend\Settings::serializeToForum, but it doesn't seem to work
             // might have been because of https://github.com/flarum/framework/issues/3438
             $attributes['anonymousHelpTextPosition'] = $this->settings->get('anonymous-posting.composerHelpTextPosition') ?: 'visible';
 
-            $avatarRules = json_decode($this->settings->get('anonymous-posting.formulaireAvatars'), true);
+            $avatarRules = json_decode((string)$this->settings->get('anonymous-posting.formulaireAvatars'), true);
 
             if (is_array($avatarRules) && class_exists(Submission::class)) {
                 $attributes['anonymousAvatarUrl'] = AnonymousAvatar::retrieve(
