@@ -6,13 +6,35 @@ use ClarkWinkelmann\AnonymousPosting\Event\DiscussionAnonymized;
 use ClarkWinkelmann\AnonymousPosting\Event\DiscussionDeAnonymized;
 use Flarum\Discussion\Event\Saving;
 use Illuminate\Support\Arr;
+use Flarum\Tags\Tag;
+use Flarum\User\User;
+use Flarum\Discussion\Discussion;
 
 class SaveDiscussion extends AbstractAnonymousStateEditor
 {
     public function handle(Saving $event)
     {
         $attributes = (array)Arr::get($event->data, 'attributes');
-
+        $imposterActor = null;
+        if (class_exists(Tag::class) && isset($event->data['relationships']['tags']['data'])) {
+            $tagId = $event->data['relationships']['tags']['data'][0]["id"];
+            $tag = Tag::where('id', $tagId)->firstOrFail();
+            if ($tag) {
+                $userId = $this->anonymityRepository->anonymousUserIdByTagName($tag->name);
+            }
+        }
+        if ($userId == null) {
+            // Get default anonymous user profile
+            $userId = $this->anonymityRepository->anonymousUserIdDefault();
+        }
+        if ($userId != null) {
+            // Find user and replace actor
+            $imposterActor = User::where('id', $userId)->firstOrFail();
+            if ($imposterActor) {
+                $event->discussion->user_id = $userId;
+                return $event;
+            }
+        }
         $this->apply($event->actor, $event->discussion, $attributes, DiscussionAnonymized::class, DiscussionDeAnonymized::class);
 
         // Anonymize deletion author if it's the author of an anonymous discussion

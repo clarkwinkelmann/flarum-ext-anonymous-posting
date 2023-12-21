@@ -32,4 +32,19 @@ class AnonymityRepository
 
         return $model->anonymous_user_id === $editorUserId;
     }
+
+    public function anonymousUserIdByTagName(string $tagName): ?int
+    {
+        $anonymousUsers = json_decode($this->settings->get('anonymous-posting.anonymousUsers'), true);
+        return AnonymousUserProfile::retrieve($anonymousUsers, $tagName);
+    }
+
+    public function anonymousUserIdDefault(): ?int
+    {
+        if (intval($this->settings->get('anonymous-posting.defaultAnonymousUserProfile')) > 0) {
+            return intval($this->settings->get('anonymous-posting.defaultAnonymousUserProfile'));
+        }
+
+        return null;
+    }
 }

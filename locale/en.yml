@@ -1,6 +1,14 @@
 clarkwinkelmann-anonymous-posting:
     admin:
         settings:
+            defaultAnonymousUserProfile: Default anonymous User ID without using anonymous avatars
+            defaultAnonymousUserProfileHelp: Entering the user ID will hide the author, for all toggled 'Post anonymously'
+            anonymousUserProfileByTags: "Assign anonymous user profile for specific tags (Tags extension must be enabled)"
+            anonymousUserProfileByTagsHelp: >
+                Using this feature will select different user profile for different tags, to continue using anonymous avatar you can leave the `Imposter User Id` as blank. 
+            anonymousUserProfileByTagsAdd: Add anonymous by tag rule
+            anonymousUserProfileTagName: Tag Name
+            anonymousUserProfileUserId: Imposter User ID
             defaultAnonymity: New content anonymous by default
             defaultAnonymityWhenAbleToSwitch: New content anonymous by default for users with switch permission
             alwaysAnonymiseEdits: Always anonymize edits

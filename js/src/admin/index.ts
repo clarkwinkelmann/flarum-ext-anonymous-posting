@@ -3,6 +3,7 @@ import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 import Button from 'flarum/common/components/Button';
 
 const avatarsSettingKey = 'anonymous-posting.formulaireAvatars';
+const anonymousUsersSettingKey = 'anonymous-posting.anonymousUsers';
 const translationPrefix = 'clarkwinkelmann-anonymous-posting.admin.settings.';
 
 interface Avatar {
@@ -11,10 +12,89 @@ interface Avatar {
     fieldValue: string
     avatarUrl: string
 }
+interface AnonymousUser {
+    tagName: string
+    userId: number
+}
 
 app.initializers.add('anonymous-posting', () => {
     app.extensionData
         .for('clarkwinkelmann-anonymous-posting')
+        .registerSetting({
+            setting: 'anonymous-posting.defaultAnonymousUserProfile',
+            label: app.translator.trans(translationPrefix + 'defaultAnonymousUserProfile'),
+            required: false,
+            type: 'number',
+            help: app.translator.trans(translationPrefix + 'defaultAnonymousUserProfileHelp'),
+        })
+        .registerSetting(function (this: ExtensionPage) {
+            let anonymousUsers: AnonymousUser[];
+
+            try {
+                anonymousUsers = JSON.parse(this.setting(anonymousUsersSettingKey)());
+            } catch (e) {
+                // do nothing, we'll reset to something usable
+            }
+
+            // @ts-ignore variable used before assignment, it's fine
+            if (!Array.isArray(anonymousUsers)) {
+                anonymousUsers = [];
+            }
+
+            return m('.Form-group', [
+                m('label', app.translator.trans(translationPrefix + 'anonymousUserProfileByTags')),
+                m('.helpText', app.translator.trans(translationPrefix + 'anonymousUserProfileByTagsHelp')),
+                m('table', [
+                    m('thead', m('tr', [
+                        m('th', app.translator.trans(translationPrefix + 'anonymousUserProfileTagName')),
+                        m('th', app.translator.trans(translationPrefix + 'anonymousUserProfileUserId')),
+                        m('th'),
+                    ])),
+                    m('tbody', [
+                        anonymousUsers.map((rule, index) => m('tr', [
+                            m('td', m('input.FormControl', {
+                                type: 'text',
+                                value: rule.tagName || '',
+                                onchange: (event: InputEvent) => {
+                                    rule.tagName = (event.target as HTMLInputElement).value;
+                                    this.setting(anonymousUsersSettingKey)(JSON.stringify(anonymousUsers));
+                                },
+                            })),
+                            m('td', m('input.FormControl', {
+                                type: 'number',
+                                value: rule.userId || '',
+                                onchange: (event: InputEvent) => {
+                                    rule.userId = (event.target as HTMLInputElement).value;
+                                    this.setting(anonymousUsersSettingKey)(JSON.stringify(anonymousUsers));
+                                },
+                            })),
+                            m('td', Button.component({
+                                className: 'Button Button--icon',
+                                icon: 'fas fa-times',
+                                onclick: () => {
+                                    anonymousUsers.splice(index, 1);
+
+                                    this.setting(anonymousUsersSettingKey)(anonymousUsers.length > 0 ? JSON.stringify(anonymousUsers) : null);
+                                },
+                            })),
+                        ])),
+                        m('tr', m('td', {
+                            colspan: 5,
+                        }, Button.component({
+                            className: 'Button Button--block',
+                            onclick: () => {
+                                anonymousUsers.push({
+                                    tagName: '',
+                                    userId: null,
+                                });
+
+                                this.setting(anonymousUsersSettingKey)(JSON.stringify(anonymousUsers));
+                            },
+                        }, app.translator.trans(translationPrefix + 'anonymousUserProfileByTagsAdd'))))
+                    ]),
+                ]),
+            ]);
+        })
         .registerSetting({
             setting: 'anonymous-posting.defaultAnonymity',
             label: app.translator.trans(translationPrefix + 'defaultAnonymity'),
