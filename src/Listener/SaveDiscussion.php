@@ -15,7 +15,7 @@ class SaveDiscussion extends AbstractAnonymousStateEditor
     public function handle(Saving $event)
     {
         $attributes = (array)Arr::get($event->data, 'attributes');
-        $imposterActor = null;
+        $userId = null;
         if (class_exists(Tag::class) && isset($event->data['relationships']['tags']['data'])) {
             $tagId = $event->data['relationships']['tags']['data'][0]["id"];
             $tag = Tag::where('id', $tagId)->firstOrFail();
@@ -23,11 +23,11 @@ class SaveDiscussion extends AbstractAnonymousStateEditor
                 $userId = $this->anonymityRepository->anonymousUserIdByTagName($tag->name);
             }
         }
-        if ($userId == null) {
+        if ($userId === null) {
             // Get default anonymous user profile
             $userId = $this->anonymityRepository->anonymousUserIdDefault();
         }
-        if ($userId != null) {
+        if ($userId > 0) {
             // Find user and replace actor
             $imposterActor = User::where('id', $userId)->firstOrFail();
             if ($imposterActor) {
@@ -40,8 +40,9 @@ class SaveDiscussion extends AbstractAnonymousStateEditor
         // Anonymize deletion author if it's the author of an anonymous discussion
         if (
             $event->discussion->isDirty('hidden_user_id') &&
-            $event->discussion->anonymous_user_id &&
-            $this->anonymityRepository->shouldAnonymizeEdit($event->discussion, $event->discussion->hidden_user_id)) {
+            $event->discussion->anonymous_user_id && 
+            ($this->anonymityRepository->shouldAnonymizeEdit($event->discussion, $event->discussion->hidden_user_id) || $userId == 0)
+        ) {
             // There are no relationships to unset here because Flarum doesn't have any for hiddenUser
             $event->discussion->hidden_user_id = null;
         }

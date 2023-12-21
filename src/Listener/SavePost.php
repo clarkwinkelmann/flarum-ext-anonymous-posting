@@ -14,8 +14,7 @@ class SavePost extends AbstractAnonymousStateEditor
     public function handle(Saving $event)
     {
         $attributes = (array)Arr::get($event->data, 'attributes');
-
-        $imposterActor = null;
+        $userId = null;
         if (class_exists(Tag::class) && isset($event->data['relationships']['tags']['data'])) {
             $tagId = $event->data['relationships']['tags']['data'][0]["id"];
             $tag = Tag::where('id', $tagId)->firstOrFail();
@@ -23,11 +22,11 @@ class SavePost extends AbstractAnonymousStateEditor
                 $userId = $this->anonymityRepository->anonymousUserIdByTagName($tag->name);
             }
         }
-        if ($userId == null) {
+        if ($userId === null) {
             // Get default anonymous user profile
             $userId = $this->anonymityRepository->anonymousUserIdDefault();
         }
-        if ($userId != null) {
+        if ($userId > 0) {
             // Find user and replace actor
             $imposterActor = User::where('id', $userId)->firstOrFail();
             if ($imposterActor) {
@@ -41,13 +40,15 @@ class SavePost extends AbstractAnonymousStateEditor
         if (
             $event->post->isDirty('edited_user_id') &&
             $event->post->anonymous_user_id &&
-            $this->anonymityRepository->shouldAnonymizeEdit($event->post, $event->post->edited_user_id)) {
+            ($this->anonymityRepository->shouldAnonymizeEdit($event->post, $event->post->edited_user_id) || $userId == 0)
+        ) {
             $event->post->editedUser()->dissociate();
         }
         if (
             $event->post->isDirty('hidden_user_id') &&
             $event->post->anonymous_user_id &&
-            $this->anonymityRepository->shouldAnonymizeEdit($event->post, $event->post->hidden_user_id)) {
+            ($this->anonymityRepository->shouldAnonymizeEdit($event->post, $event->post->hidden_user_id) || $userId == 0)
+        ) {
             $event->post->hiddenUser()->dissociate();
         }
     }

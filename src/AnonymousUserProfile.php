@@ -11,7 +11,7 @@ class AnonymousUserProfile
         foreach ($anonymousUsers as $anonymousUser) {
             if ($tagName == Arr::get($anonymousUser, 'tagName')) {
                 $userId = intval(Arr::get($anonymousUser, 'userId'));
-                return $userId > 0? $userId : null;
+                return $userId > 0? $userId : 0;
             }
         }
 
