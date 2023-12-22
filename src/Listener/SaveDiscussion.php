@@ -17,10 +17,13 @@ class SaveDiscussion extends AbstractAnonymousStateEditor
         $attributes = (array)Arr::get($event->data, 'attributes');
         $userId = null;
         if (class_exists(Tag::class) && isset($event->data['relationships']['tags']['data'])) {
-            $tagId = $event->data['relationships']['tags']['data'][0]["id"];
-            $tag = Tag::where('id', $tagId)->firstOrFail();
-            if ($tag) {
-                $userId = $this->anonymityRepository->anonymousUserIdByTagName($tag->name);
+            // Check for any tags available for imposter or avatar
+            if(count($event->data['relationships']['tags']['data']) > 0) {
+                $tagId = $event->data['relationships']['tags']['data'][0]["id"];
+                $tag = Tag::where('id', $tagId)->firstOrFail();
+                if ($tag) {
+                    $userId = $this->anonymityRepository->anonymousUserIdByTagName($tag->name, "Discussion");
+                }
             }
         }
         if ($userId === null) {

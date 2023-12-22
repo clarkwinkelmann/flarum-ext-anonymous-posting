@@ -9,6 +9,9 @@ clarkwinkelmann-anonymous-posting:
             anonymousUserProfileByTagsAdd: Add anonymous by tag rule
             anonymousUserProfileTagName: Tag Name
             anonymousUserProfileUserId: Imposter User ID
+            anonymousUserProfileIsCreatingDiscussion: Discussion Only
+            anonymousUserProfileIsCreatingPost: Post Only
+            anonymousUserProfileIsEnabled: Is Enabled
             defaultAnonymity: New content anonymous by default
             defaultAnonymityWhenAbleToSwitch: New content anonymous by default for users with switch permission
             alwaysAnonymiseEdits: Always anonymize edits

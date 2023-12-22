@@ -15,6 +15,9 @@ interface Avatar {
 interface AnonymousUser {
     tagName: string
     userId: number
+    isCreatingDiscussion: boolean
+    isCreatingPost: boolean
+    isEnabled: boolean
 }
 
 app.initializers.add('anonymous-posting', () => {
@@ -48,6 +51,9 @@ app.initializers.add('anonymous-posting', () => {
                     m('thead', m('tr', [
                         m('th', app.translator.trans(translationPrefix + 'anonymousUserProfileTagName')),
                         m('th', app.translator.trans(translationPrefix + 'anonymousUserProfileUserId')),
+                        m('th', app.translator.trans(translationPrefix + 'anonymousUserProfileIsCreatingDiscussion')),
+                        m('th', app.translator.trans(translationPrefix + 'anonymousUserProfileIsCreatingPost')),
+                        m('th', app.translator.trans(translationPrefix + 'anonymousUserProfileIsEnabled')),
                         m('th'),
                     ])),
                     m('tbody', [
@@ -65,6 +71,30 @@ app.initializers.add('anonymous-posting', () => {
                                 value: rule.userId || '',
                                 onchange: (event: InputEvent) => {
                                     rule.userId = (event.target as HTMLInputElement).value;
+                                    this.setting(anonymousUsersSettingKey)(JSON.stringify(anonymousUsers));
+                                },
+                            })),
+                            m('td', m('input', {
+                                type: 'checkbox',
+                                checked: rule.isCreatingDiscussion,
+                                onchange: (event: InputEvent) => {
+                                    rule.isCreatingDiscussion = (event.target as HTMLInputElement).checked;
+                                    this.setting(anonymousUsersSettingKey)(JSON.stringify(anonymousUsers));
+                                },
+                            })),
+                            m('td', m('input', {
+                                type: 'checkbox',
+                                checked: rule.isCreatingPost,
+                                onchange: (event: InputEvent) => {
+                                    rule.isCreatingPost = (event.target as HTMLInputElement).checked;
+                                    this.setting(anonymousUsersSettingKey)(JSON.stringify(anonymousUsers));
+                                },
+                            })),
+                            m('td', m('input', {
+                                type: 'checkbox',
+                                checked: rule.isEnabled,
+                                onchange: (event: InputEvent) => {
+                                    rule.isEnabled = (event.target as HTMLInputElement).checked;
                                     this.setting(anonymousUsersSettingKey)(JSON.stringify(anonymousUsers));
                                 },
                             })),
@@ -86,6 +116,9 @@ app.initializers.add('anonymous-posting', () => {
                                 anonymousUsers.push({
                                     tagName: '',
                                     userId: null,
+                                    isCreatingDiscussion: false,
+                                    isCreatingPost: false,
+                                    isEnabled: false,
                                 });
 
                                 this.setting(anonymousUsersSettingKey)(JSON.stringify(anonymousUsers));
