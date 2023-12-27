@@ -42,7 +42,7 @@ class SavePost extends AbstractAnonymousStateEditor
             $imposterActor = User::where('id', $userId)->firstOrFail();
             if ($imposterActor) {
                 $event->post->user_id = $userId;
-                return $event;
+                return;
             }
         }
         $this->apply($event->actor, $event->post, $attributes, PostAnonymized::class, PostDeAnonymized::class);

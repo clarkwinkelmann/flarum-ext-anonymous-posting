@@ -35,7 +35,7 @@ class SaveDiscussion extends AbstractAnonymousStateEditor
             $imposterActor = User::where('id', $userId)->firstOrFail();
             if ($imposterActor) {
                 $event->discussion->user_id = $userId;
-                return $event;
+                return;
             }
         }
         $this->apply($event->actor, $event->discussion, $attributes, DiscussionAnonymized::class, DiscussionDeAnonymized::class);
