@@ -16,19 +16,22 @@ class SaveDiscussion extends AbstractAnonymousStateEditor
     {
         $attributes = (array)Arr::get($event->data, 'attributes');
         $userId = null;
-        if (class_exists(Tag::class) && isset($event->data['relationships']['tags']['data'])) {
-            // Check for any tags available for imposter or avatar
-            if(count($event->data['relationships']['tags']['data']) > 0) {
-                $tagId = $event->data['relationships']['tags']['data'][0]["id"];
-                $tag = Tag::where('id', $tagId)->firstOrFail();
-                if ($tag) {
-                    $userId = $this->anonymityRepository->anonymousUserIdByTagName($tag->name, "Discussion");
+        if (!$event->post->exists) {
+            // Only modify user upon creation of Discussion or Post.
+            if (class_exists(Tag::class) && isset($event->data['relationships']['tags']['data'])) {
+                // Check for any tags available for imposter or avatar
+                if(count($event->data['relationships']['tags']['data']) > 0) {
+                    $tagId = $event->data['relationships']['tags']['data'][0]["id"];
+                    $tag = Tag::where('id', $tagId)->firstOrFail();
+                    if ($tag) {
+                        $userId = $this->anonymityRepository->anonymousUserIdByTagName($tag->name, "Discussion");
+                    }
                 }
             }
-        }
-        if ($userId === null) {
-            // Get default anonymous user profile
-            $userId = $this->anonymityRepository->anonymousUserIdDefault();
+            if ($userId === null) {
+                // Get default anonymous user profile
+                $userId = $this->anonymityRepository->anonymousUserIdDefault();
+            }
         }
         if ($userId > 0) {
             // Find user and replace actor

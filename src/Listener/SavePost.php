@@ -16,26 +16,29 @@ class SavePost extends AbstractAnonymousStateEditor
     {
         $attributes = (array)Arr::get($event->data, 'attributes');
         $userId = null;
-        if (Arr::get($event->data, 'type') == 'discussions' && class_exists(Tag::class) && isset($event->data['relationships']['tags']['data'])) {
-            // Identify that the post is linked at the creation of the discussion
-            if(count($event->data['relationships']['tags']['data']) > 0) {
-                $tagId = $event->data['relationships']['tags']['data'][0]["id"];
-                $tag = Tag::where('id', $tagId)->firstOrFail();
-                if ($tag) {
-                    $userId = $this->anonymityRepository->anonymousUserIdByTagName($tag->name, "Discussion");
+        if (!$event->post->exists) {
+            // Only modify user upon creation of Discussion or Post.
+            if (Arr::get($event->data, 'type') == 'discussions' && class_exists(Tag::class) && isset($event->data['relationships']['tags']['data'])) {
+                // Identify that the post is linked at the creation of the discussion
+                if(count($event->data['relationships']['tags']['data']) > 0) {
+                    $tagId = $event->data['relationships']['tags']['data'][0]["id"];
+                    $tag = Tag::where('id', $tagId)->firstOrFail();
+                    if ($tag) {
+                        $userId = $this->anonymityRepository->anonymousUserIdByTagName($tag->name, "Discussion");
+                    }
+                }
+            } else if (Arr::get($event->data, 'type') == 'posts' && class_exists(Tag::class) && isset($event->post->discussion->tags)) {
+                if(count($event->post->discussion->tags) > 0) {
+                    $tag = $event->post->discussion->tags[0];
+                    if ($tag) {
+                        $userId = $this->anonymityRepository->anonymousUserIdByTagName($tag->name, "Post");
+                    }
                 }
             }
-        } else if (Arr::get($event->data, 'type') == 'posts' && class_exists(Tag::class) && isset($event->post->discussion->tags)) {
-            if(count($event->post->discussion->tags) > 0) {
-                $tag = $event->post->discussion->tags[0];
-                if ($tag) {
-                    $userId = $this->anonymityRepository->anonymousUserIdByTagName($tag->name, "Post");
-                }
+            if ($userId === null) {
+                // Get default anonymous user profile
+                $userId = $this->anonymityRepository->anonymousUserIdDefault();
             }
-        }
-        if ($userId === null) {
-            // Get default anonymous user profile
-            $userId = $this->anonymityRepository->anonymousUserIdDefault();
         }
         if ($userId > 0) {
             // Find user and replace actor
