@@ -16,28 +16,13 @@ class SavePost extends AbstractAnonymousStateEditor
     {
         $attributes = (array)Arr::get($event->data, 'attributes');
         $userId = null;
-        if (!$event->post->exists) {
+        if (class_exists(Tag::class) && !$event->post->exists && $attributes['isAnonymous']) {
             // Only modify user upon creation of Discussion or Post.
-            if (Arr::get($event->data, 'type') == 'discussions' && class_exists(Tag::class) && isset($event->data['relationships']['tags']['data'])) {
+            if ($event->post->discussion->first_post_id == NULL && isset($event->data['relationships']['tags']['data'])) {
                 // Identify that the post is linked at the creation of the discussion
-                if(count($event->data['relationships']['tags']['data']) > 0) {
-                    $tagId = $event->data['relationships']['tags']['data'][0]["id"];
-                    $tag = Tag::where('id', $tagId)->firstOrFail();
-                    if ($tag) {
-                        $userId = $this->anonymityRepository->anonymousUserIdByTagName($tag->name, "Discussion");
-                    }
-                }
-            } else if (Arr::get($event->data, 'type') == 'posts' && class_exists(Tag::class) && isset($event->post->discussion->tags)) {
-                if(count($event->post->discussion->tags) > 0) {
-                    $tag = $event->post->discussion->tags[0];
-                    if ($tag) {
-                        $userId = $this->anonymityRepository->anonymousUserIdByTagName($tag->name, "Post");
-                    }
-                }
-            }
-            if ($userId === null) {
-                // Get default anonymous user profile
-                $userId = $this->anonymityRepository->anonymousUserIdDefault();
+                $userId = $this->anonymityRepository->anonymousUserIdByTags($event->data['relationships']['tags']['data'], "Discussion");
+            } else if (isset($event->post->discussion->tags)) {
+                $userId = $this->anonymityRepository->anonymousUserIdByTags($event->post->discussion->tags, "Post");
             }
         }
         if ($userId > 0) {

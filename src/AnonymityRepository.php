@@ -5,6 +5,7 @@ namespace ClarkWinkelmann\AnonymousPosting;
 use Flarum\Database\AbstractModel;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
+use Flarum\Tags\Tag;
 
 class AnonymityRepository
 {
@@ -31,6 +32,29 @@ class AnonymityRepository
         }
 
         return $model->anonymous_user_id === $editorUserId;
+    }
+
+    public function anonymousUserIdByTags($tags, string $type): ?int
+    {
+        $userId = null;
+        foreach ($tags as &$tag) {
+            if (isset($tag->id)) {
+                $userId = $this->anonymousUserIdByTagName($tag->name, $type);
+            } else {
+                $tagFound = Tag::where('id', $tag['id'])->firstOrFail();
+                if ($tagFound) {
+                    $userId = $this->anonymousUserIdByTagName($tagFound->name, $type);
+                }
+            }
+            if($userId != null) {
+                break;
+            }
+        }
+        if ($userId === null) {
+            // Get default anonymous user profile
+            $userId = $this->anonymousUserIdDefault();
+        }
+        return $userId;
     }
 
     public function anonymousUserIdByTagName(string $tagName, string $type): ?int

@@ -16,21 +16,11 @@ class SaveDiscussion extends AbstractAnonymousStateEditor
     {
         $attributes = (array)Arr::get($event->data, 'attributes');
         $userId = null;
-        if (!$event->post->exists) {
+        if (class_exists(Tag::class) && !$event->post->exists && $attributes['isAnonymous']) {
             // Only modify user upon creation of Discussion or Post.
-            if (class_exists(Tag::class) && isset($event->data['relationships']['tags']['data'])) {
+            if (isset($event->data['relationships']['tags']['data'])) {
                 // Check for any tags available for imposter or avatar
-                if(count($event->data['relationships']['tags']['data']) > 0) {
-                    $tagId = $event->data['relationships']['tags']['data'][0]["id"];
-                    $tag = Tag::where('id', $tagId)->firstOrFail();
-                    if ($tag) {
-                        $userId = $this->anonymityRepository->anonymousUserIdByTagName($tag->name, "Discussion");
-                    }
-                }
-            }
-            if ($userId === null) {
-                // Get default anonymous user profile
-                $userId = $this->anonymityRepository->anonymousUserIdDefault();
+                $userId = $this->anonymityRepository->anonymousUserIdByTags($event->data['relationships']['tags']['data'], "Discussion");
             }
         }
         if ($userId > 0) {
