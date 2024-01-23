@@ -72,4 +72,10 @@ class AnonymityRepository
 
         return null;
     }
+
+    public function listOfAnonymousUsersByTag(array | Collection $tags): array
+    {
+        $anonymousUsers = json_decode($this->settings->get('anonymous-posting.anonymousUsers'), true);
+        return AnonymousUserProfile::retrieveAll($anonymousUsers);
+    }
 }

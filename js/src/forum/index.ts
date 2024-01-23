@@ -79,19 +79,47 @@ function extendComposerView(this: DiscussionComposer | ReplyComposer, vdom: any)
             if (!child || !child.attrs || !child.attrs.className || child.attrs.className.indexOf('ComposerBody-avatar') === -1) {
                 return;
             }
-
-            vdom.children[index] = anonymousAvatar(app.forum, '.ComposerBody-avatar');
+            if ("tags" in app.composer.fields) {
+                // Check what type of composer is used
+                var composerType = "Discussion";
+                if (this instanceof ReplyComposer) {
+                    composerType = "Post";
+                }
+                vdom.children[index] = anonymousAvatar(app.forum, '.ComposerBody-avatar', composerType, app.composer.fields.tags);
+            } else {
+                vdom.children[index] = anonymousAvatar(app.forum, '.ComposerBody-avatar');
+            }
         });
     });
 }
 
-function anonymousAvatar(post: Discussion | Post | Forum, className: string = '') {
+function anonymousAvatar(post: Discussion | Post | Forum, className: string = '', composerType?: string, selectedTags?: []) {
     const src = post.attribute('anonymousAvatarUrl');
-
-    if (src) {
-        return m('img.Avatar.Avatar--anonymous' + className, {
-            src,
+    const allTags = post.attribute('anonymousImposters');
+    var imageSrc = null;
+    if (selectedTags && allTags && composerType in allTags) {
+        var composerTypeTags = allTags[composerType];
+        for (const tag of selectedTags) {
+            if (tag.data.attributes.name in composerTypeTags) {
+                var foundMatchingTag = composerTypeTags[tag.data.attributes.name];
+                imageSrc = {
+                    url: foundMatchingTag.avatar_url,
+                    alt: foundMatchingTag.username,
+                };
+                break;
+            }
+        }; 
+    }
+    if (imageSrc == null && src) {
+        imageSrc = {
+            url: src,
             alt: app.translator.trans('clarkwinkelmann-anonymous-posting.lib.userMeta.username'),
+        };
+    }
+    if (imageSrc) {
+        return m('img.Avatar.Avatar--anonymous' + className, {
+            src: imageSrc.url,
+            alt: imageSrc.alt,
         });
     }
 

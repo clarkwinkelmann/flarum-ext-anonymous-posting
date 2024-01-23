@@ -42,6 +42,7 @@
                 "color": "#fff"
             },
             "optional-dependencies": [
+                "flarum/tags",
                 "flarum/mentions",
                 "kilowhat/flarum-ext-formulaire"
             ]

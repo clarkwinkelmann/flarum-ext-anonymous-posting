@@ -3,6 +3,7 @@
 namespace ClarkWinkelmann\AnonymousPosting;
 
 use Illuminate\Support\Arr;
+use Flarum\User\User;
 
 class AnonymousUserProfile
 {
@@ -16,5 +17,33 @@ class AnonymousUserProfile
         }
 
         return null;
+    }
+
+    public static function retrieveAll(array $anonymousUsers): array
+    {
+        $types = [
+            "Discussion",
+            "Post",
+        ];
+        $list = [
+            "Discussion" => [],
+            "Post" => []
+        ];
+        foreach ($anonymousUsers as $anonymousUser) {
+            foreach ($types as $type) {
+                if (Arr::get($anonymousUser, 'isCreating'.$type) && Arr::get($anonymousUser, 'isEnabled')) {
+                    $userId = intval(Arr::get($anonymousUser, 'userId'));
+                    $imposterActor = User::where('id', $userId)->firstOrFail();
+                    if ($imposterActor) {
+                        $list[$type][Arr::get($anonymousUser, 'tagName')] = [
+                            "id" => $imposterActor->id,
+                            "avatar_url" => $imposterActor->avatar_url,
+                            "username" => $imposterActor->username,
+                        ];
+                    }
+                }
+            }
+        }
+        return $list;
     }
 }
