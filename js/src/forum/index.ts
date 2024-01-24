@@ -126,7 +126,6 @@ function anonymousAvatar(post: Discussion | Post | Forum, className: string = ''
             return m('span.Avatar ComposerBody-avatar' + className, {
                 alt: imageSrc.alt,
                 style: '--avatar-bg: #a0e5b3;',
-                text: 'U',
             }, imageSrc.alt.charAt(0).toUpperCase());
         }
     }
