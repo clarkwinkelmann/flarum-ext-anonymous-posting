@@ -48,7 +48,7 @@ class ForumAttributes
         }
         $anonymousUsers = json_decode($this->settings->get('anonymous-posting.anonymousUsers'), true);
         if (is_array($anonymousUsers) && class_exists(Tag::class)) {
-            $attributes['anonymousImposters'] = AnonymousUserProfile::retrieveAll($anonymousUsers);
+            $attributes['anonymousImposters'] = AnonymousUserProfile::retrieveAll($anonymousUsers, $serializer->getActor());
         }
 
         return $attributes;

@@ -23,7 +23,10 @@ class SaveDiscussion extends AbstractAnonymousStateEditor
                 $userId = $this->anonymityRepository->anonymousUserIdByTags($event->data['relationships']['tags']['data'], "Discussion");
             }
         }
-        if ($userId > 0) {
+        if ($userId < 0) {
+            // Avoid using Anonymous
+            return;
+        } else if ($userId > 0) {
             // Find user and replace actor
             $imposterActor = User::where('id', $userId)->firstOrFail();
             if ($imposterActor) {

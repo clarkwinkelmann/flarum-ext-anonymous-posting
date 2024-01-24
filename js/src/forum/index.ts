@@ -117,10 +117,18 @@ function anonymousAvatar(post: Discussion | Post | Forum, className: string = ''
         };
     }
     if (imageSrc) {
-        return m('img.Avatar.Avatar--anonymous' + className, {
-            src: imageSrc.url,
-            alt: imageSrc.alt,
-        });
+        if (imageSrc.url) {
+            return m('img.Avatar.Avatar--anonymous' + className, {
+                src: imageSrc.url,
+                alt: imageSrc.alt,
+            });
+        } else {
+            return m('span.Avatar ComposerBody-avatar' + className, {
+                alt: imageSrc.alt,
+                style: '--avatar-bg: #a0e5b3;',
+                text: 'U',
+            }, imageSrc.alt.charAt(0).toUpperCase());
+        }
     }
 
     return m('span.Avatar.Avatar--anonymous' + className, app.translator.trans('clarkwinkelmann-anonymous-posting.lib.userMeta.initials'));
