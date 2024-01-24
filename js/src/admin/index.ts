@@ -24,6 +24,34 @@ app.initializers.add('anonymous-posting', () => {
     app.extensionData
         .for('clarkwinkelmann-anonymous-posting')
         .registerSetting({
+            setting: 'anonymous-posting.defaultAnonymity',
+            label: app.translator.trans(translationPrefix + 'defaultAnonymity'),
+            type: 'switch',
+        })
+        .registerSetting({
+            setting: 'anonymous-posting.defaultAnonymityWhenAbleToSwitch',
+            type: 'switch',
+            label: app.translator.trans(translationPrefix + 'defaultAnonymityWhenAbleToSwitch'),
+        })
+        .registerSetting({
+            setting: 'anonymous-posting.alwaysAnonymiseEdits',
+            type: 'switch',
+            label: app.translator.trans(translationPrefix + 'alwaysAnonymiseEdits'),
+            help: app.translator.trans(translationPrefix + 'alwaysAnonymiseEditsHelp'),
+        })
+        .registerSetting({
+            setting: 'anonymous-posting.composerHelpTextPosition',
+            type: 'select',
+            options: {
+                visible: app.translator.trans(translationPrefix + 'composerHelpTextPositionVisible'),
+                tooltip: app.translator.trans(translationPrefix + 'composerHelpTextPositionTooltip'),
+                hidden: app.translator.trans(translationPrefix + 'composerHelpTextPositionHidden'),
+            },
+            default: 'visible',
+            label: app.translator.trans(translationPrefix + 'composerHelpTextPosition'),
+            help: app.translator.trans(translationPrefix + 'composerHelpTextPositionHelp'),
+        })
+        .registerSetting({
             setting: 'anonymous-posting.defaultAnonymousUserProfile',
             label: app.translator.trans(translationPrefix + 'defaultAnonymousUserProfile'),
             required: false,
@@ -127,34 +155,6 @@ app.initializers.add('anonymous-posting', () => {
                     ]),
                 ]),
             ]);
-        })
-        .registerSetting({
-            setting: 'anonymous-posting.defaultAnonymity',
-            label: app.translator.trans(translationPrefix + 'defaultAnonymity'),
-            type: 'switch',
-        })
-        .registerSetting({
-            setting: 'anonymous-posting.defaultAnonymityWhenAbleToSwitch',
-            type: 'switch',
-            label: app.translator.trans(translationPrefix + 'defaultAnonymityWhenAbleToSwitch'),
-        })
-        .registerSetting({
-            setting: 'anonymous-posting.alwaysAnonymiseEdits',
-            type: 'switch',
-            label: app.translator.trans(translationPrefix + 'alwaysAnonymiseEdits'),
-            help: app.translator.trans(translationPrefix + 'alwaysAnonymiseEditsHelp'),
-        })
-        .registerSetting({
-            setting: 'anonymous-posting.composerHelpTextPosition',
-            type: 'select',
-            options: {
-                visible: app.translator.trans(translationPrefix + 'composerHelpTextPositionVisible'),
-                tooltip: app.translator.trans(translationPrefix + 'composerHelpTextPositionTooltip'),
-                hidden: app.translator.trans(translationPrefix + 'composerHelpTextPositionHidden'),
-            },
-            default: 'visible',
-            label: app.translator.trans(translationPrefix + 'composerHelpTextPosition'),
-            help: app.translator.trans(translationPrefix + 'composerHelpTextPositionHelp'),
         })
         .registerSetting(function (this: ExtensionPage) {
             let avatars: Avatar[];
