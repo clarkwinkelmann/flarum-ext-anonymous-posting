@@ -80,17 +80,21 @@ function extendComposerView(this: DiscussionComposer | ReplyComposer, vdom: any)
                 return;
             }
             if ("tags" in app.composer.fields) {
-                // Check what type of composer is used
-                var composerType = "Discussion";
-                if (this instanceof ReplyComposer) {
-                    composerType = "Post";
-                }
-                vdom.children[index] = anonymousAvatar(app.forum, '.ComposerBody-avatar', composerType, app.composer.fields.tags);
+                vdom.children[index] = anonymousAvatar(app.forum, '.ComposerBody-avatar', "Discussion", app.composer.fields.tags);
+            } else if (this instanceof ReplyComposer && app.composer.body.attrs.discussion.data.relationships && "tags" in app.composer.body.attrs.discussion.data.relationships) {
+                vdom.children[index] = anonymousAvatar(app.forum, '.ComposerBody-avatar', "Post", app.composer.body.attrs.discussion.data.relationships.tags.data);
             } else {
                 vdom.children[index] = anonymousAvatar(app.forum, '.ComposerBody-avatar');
             }
         });
     });
+}
+
+function getAnonymousProfile(profile: { [key: string]: any }) {
+    return {
+        url: profile.user_avatar_url,
+        alt: profile.user_username,
+    };
 }
 
 function anonymousAvatar(post: Discussion | Post | Forum, className: string = '', composerType?: string, selectedTags?: []) {
@@ -100,12 +104,13 @@ function anonymousAvatar(post: Discussion | Post | Forum, className: string = ''
     if (selectedTags && allTags && composerType in allTags) {
         var composerTypeTags = allTags[composerType];
         for (const tag of selectedTags) {
-            if (tag.data.attributes.name in composerTypeTags) {
-                var foundMatchingTag = composerTypeTags[tag.data.attributes.name];
-                imageSrc = {
-                    url: foundMatchingTag.avatar_url,
-                    alt: foundMatchingTag.username,
-                };
+            /* Different structure for Post and Discussion
+             * .type = Post
+             * .data.type = Discussion
+             */
+            var tagId = tag.type == "tags"? tag.id: (tag.data.type == "tags"? Number(tag.data.id): null);
+            if (tagId in composerTypeTags) {
+                imageSrc = getAnonymousProfile(composerTypeTags[tagId]);
                 break;
             }
         }; 
