@@ -36,7 +36,7 @@ class AnonymousUserProfile
                     $userId = intval(Arr::get($anonymousUser, 'userId'));
                     if ($userId != 0) {
                         $tagName = Arr::get($anonymousUser, 'tagName');
-                        $tag = Tag::where('name', $tagName)->firstOrFail();
+                        $tag = Tag::where('name', $tagName)->first();
                         if ($tag) {
                             if ($userId < 0) {
                                 $list[$type][$tag->id] = [
@@ -47,7 +47,7 @@ class AnonymousUserProfile
                                 ];
                             } else {
                                 // Assign current user to tag
-                                $imposterActor = User::where('id', $userId)->firstOrFail();
+                                $imposterActor = User::where('id', $userId)->first();
                                 if ($imposterActor) {
                                     $list[$type][$tag->id] = [
                                         "name" => $tagName,

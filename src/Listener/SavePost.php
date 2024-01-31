@@ -30,7 +30,7 @@ class SavePost extends AbstractAnonymousStateEditor
             return;
         } else if ($userId > 0) {
             // Find user and replace actor
-            $imposterActor = User::where('id', $userId)->firstOrFail();
+            $imposterActor = User::where('id', $userId)->first();
             if ($imposterActor) {
                 $event->post->user_id = $userId;
                 return;

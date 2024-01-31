@@ -42,7 +42,7 @@ class AnonymityRepository
             if (isset($tag->id)) {
                 $userId = $this->anonymousUserIdByTagName($tag->name, $type);
             } else {
-                $tagFound = Tag::where('id', $tag['id'])->firstOrFail();
+                $tagFound = Tag::where('id', $tag['id'])->first();
                 if ($tagFound) {
                     $userId = $this->anonymousUserIdByTagName($tagFound->name, $type);
                 }
