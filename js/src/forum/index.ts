@@ -79,23 +79,82 @@ function extendComposerView(this: DiscussionComposer | ReplyComposer, vdom: any)
             if (!child || !child.attrs || !child.attrs.className || child.attrs.className.indexOf('ComposerBody-avatar') === -1) {
                 return;
             }
-
-            vdom.children[index] = anonymousAvatar(app.forum, '.ComposerBody-avatar');
+            if ("tags" in app.composer.fields) {
+                vdom.children[index] = anonymousAvatar(app.forum, '.ComposerBody-avatar', "Discussion", app.composer.fields.tags);
+            } else if (this instanceof ReplyComposer && app.composer.body.attrs.discussion.data.relationships && "tags" in app.composer.body.attrs.discussion.data.relationships) {
+                vdom.children[index] = anonymousAvatar(app.forum, '.ComposerBody-avatar', "Post", app.composer.body.attrs.discussion.data.relationships.tags.data);
+            } else {
+                vdom.children[index] = anonymousAvatar(app.forum, '.ComposerBody-avatar');
+            }
         });
     });
 }
 
-function anonymousAvatar(post: Discussion | Post | Forum, className: string = '') {
-    const src = post.attribute('anonymousAvatarUrl');
+function getAnonymousProfile(profile: { [key: string]: any }) {
+    return {
+        url: profile.user_avatar_url,
+        alt: profile.user_username,
+    };
+}
 
-    if (src) {
-        return m('img.Avatar.Avatar--anonymous' + className, {
-            src,
-            alt: app.translator.trans('clarkwinkelmann-anonymous-posting.lib.userMeta.username'),
-        });
+function anonymousAvatar(post: Discussion | Post | Forum, className: string = '', composerType?: string, selectedTags?: []) {
+    const anonymousAvatarUrl = post.attribute('anonymousAvatarUrl');
+    const allTags = post.attribute('anonymousImposters');
+    var imageSrc = processDisplayAvatar(anonymousAvatarUrl, composerType, allTags, selectedTags);
+    if (imageSrc) {
+        if (imageSrc.url) {
+            return m('img.Avatar.Avatar--anonymous' + className, {
+                src: imageSrc.url,
+                alt: imageSrc.alt,
+            });
+        } else {
+            return m('span.Avatar ComposerBody-avatar' + className, {
+                alt: imageSrc.alt,
+                style: '--avatar-bg: #a0e5b3;',
+            }, imageSrc.alt.charAt(0).toUpperCase());
+        }
     }
 
     return m('span.Avatar.Avatar--anonymous' + className, app.translator.trans('clarkwinkelmann-anonymous-posting.lib.userMeta.initials'));
+}
+
+function processDisplayAvatar(anonymousAvatarUrl, composerType, allTags, selectedTags) {
+    var imageSrc = null;
+    if (selectedTags && allTags && composerType in allTags) {
+        var composerTypeTags = allTags[composerType];
+        for (const tag of selectedTags) {
+            /* Different structure for Post and Discussion
+             * .type = Post
+             * .data.type = Discussion
+             */
+            var tagId = tag.type == "tags"? tag.id: (tag.data.type == "tags"? Number(tag.data.id): null);
+            if (tagId in composerTypeTags) {
+                imageSrc = getAnonymousProfile(composerTypeTags[tagId]);
+                break;
+            }
+        }; 
+    }
+    if (imageSrc == null && anonymousAvatarUrl) {
+        imageSrc = {
+            url: anonymousAvatarUrl,
+            alt: app.translator.trans('clarkwinkelmann-anonymous-posting.lib.userMeta.username'),
+        };
+    }
+    return imageSrc;
+}
+
+function processDisplayName(post, selectedTags) {
+    const allTags = post.attribute('anonymousImposters');
+    if (selectedTags && allTags && 'Post' in allTags) {
+        var composerTypeTags = allTags['Post'];
+        for (const tag of selectedTags) {
+            var tagId = tag.id;
+            if (tagId in composerTypeTags) {
+                return getAnonymousProfile(composerTypeTags[tagId]).alt;
+            }
+        }; 
+    }
+    return app.translator.trans('clarkwinkelmann-anonymous-posting.lib.userMeta.username');
 }
 
 app.initializers.add('anonymous-posting', () => {
@@ -201,12 +260,23 @@ app.initializers.add('anonymous-posting', () => {
 
                         // Replace preview avatar
                         if (child.attrs.className.indexOf('PostUser-avatar') !== -1) {
-                            vdom3.children[index] = anonymousAvatar(app.forum, '.PostUser-avatar');
+                            if (app.composer.body.attrs.discussion.data.relationships && "tags" in app.composer.body.attrs.discussion.data.relationships) {
+                                // Replace preview avatar with specific tags settings
+                                vdom3.children[index] = anonymousAvatar(app.forum, '.PostUser-avatar', "Post", app.composer.body.attrs.discussion.data.relationships.tags.data);
+                            } else {
+                                vdom3.children[index] = anonymousAvatar(app.forum, '.PostUser-avatar');
+                            }
                         }
 
                         // Replace preview username
                         if (child.attrs.className === 'username') {
-                            child.text = app.translator.trans('clarkwinkelmann-anonymous-posting.lib.userMeta.username');
+                            if (app.composer.body.attrs.discussion.data.relationships && "tags" in app.composer.body.attrs.discussion.data.relationships) {
+                                // Replace preview display name with specific tags settings
+                                child.text = processDisplayName(app.forum, app.composer.body.attrs.discussion.data.relationships.tags.data);
+                            } else {
+                                child.text = app.translator.trans('clarkwinkelmann-anonymous-posting.lib.userMeta.username');
+                            }
+                            
                         }
                     });
 

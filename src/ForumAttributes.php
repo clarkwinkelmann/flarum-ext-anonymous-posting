@@ -5,6 +5,7 @@ namespace ClarkWinkelmann\AnonymousPosting;
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Kilowhat\Formulaire\Submission;
+use Flarum\Tags\Tag;
 
 class ForumAttributes
 {
@@ -17,6 +18,10 @@ class ForumAttributes
         $this->anonymityRepository = $anonymityRepository;
     }
 
+    /**
+     * @param ForumSerializer $serializer
+     * @return array
+     */
     public function __invoke(ForumSerializer $serializer): array
     {
         $attributes = [
@@ -40,6 +45,10 @@ class ForumAttributes
                         ->get()
                 );
             }
+        }
+        $anonymousUsers = json_decode($this->settings->get('anonymous-posting.anonymousUsers'), true);
+        if (is_array($anonymousUsers) && class_exists(Tag::class)) {
+            $attributes['anonymousImposters'] = AnonymousUserProfile::retrieveAll($anonymousUsers, $serializer->getActor());
         }
 
         return $attributes;

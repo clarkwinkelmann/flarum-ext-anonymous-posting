@@ -3,6 +3,7 @@ import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 import Button from 'flarum/common/components/Button';
 
 const avatarsSettingKey = 'anonymous-posting.formulaireAvatars';
+const anonymousUsersSettingKey = 'anonymous-posting.anonymousUsers';
 const translationPrefix = 'clarkwinkelmann-anonymous-posting.admin.settings.';
 
 interface Avatar {
@@ -10,6 +11,13 @@ interface Avatar {
     fieldKey: string
     fieldValue: string
     avatarUrl: string
+}
+interface AnonymousUser {
+    tagName: string
+    userId: number
+    isCreatingDiscussion: boolean
+    isCreatingPost: boolean
+    isEnabled: boolean
 }
 
 app.initializers.add('anonymous-posting', () => {
@@ -42,6 +50,111 @@ app.initializers.add('anonymous-posting', () => {
             default: 'visible',
             label: app.translator.trans(translationPrefix + 'composerHelpTextPosition'),
             help: app.translator.trans(translationPrefix + 'composerHelpTextPositionHelp'),
+        })
+        .registerSetting({
+            setting: 'anonymous-posting.defaultAnonymousUserProfile',
+            label: app.translator.trans(translationPrefix + 'defaultAnonymousUserProfile'),
+            required: false,
+            type: 'number',
+            help: app.translator.trans(translationPrefix + 'defaultAnonymousUserProfileHelp'),
+        })
+        .registerSetting(function (this: ExtensionPage) {
+            let anonymousUsers: AnonymousUser[];
+
+            try {
+                anonymousUsers = JSON.parse(this.setting(anonymousUsersSettingKey)());
+            } catch (e) {
+                // do nothing, we'll reset to something usable
+            }
+
+            // @ts-ignore variable used before assignment, it's fine
+            if (!Array.isArray(anonymousUsers)) {
+                anonymousUsers = [];
+            }
+
+            return m('.Form-group', [
+                m('label', app.translator.trans(translationPrefix + 'anonymousUserProfileByTags')),
+                m('.helpText', app.translator.trans(translationPrefix + 'anonymousUserProfileByTagsHelp')),
+                m('table', [
+                    m('thead', m('tr', [
+                        m('th', app.translator.trans(translationPrefix + 'anonymousUserProfileTagName')),
+                        m('th', app.translator.trans(translationPrefix + 'anonymousUserProfileUserId')),
+                        m('th', app.translator.trans(translationPrefix + 'anonymousUserProfileIsCreatingDiscussion')),
+                        m('th', app.translator.trans(translationPrefix + 'anonymousUserProfileIsCreatingPost')),
+                        m('th', app.translator.trans(translationPrefix + 'anonymousUserProfileIsEnabled')),
+                        m('th'),
+                    ])),
+                    m('tbody', [
+                        anonymousUsers.map((rule, index) => m('tr', [
+                            m('td', m('input.FormControl', {
+                                type: 'text',
+                                value: rule.tagName || '',
+                                onchange: (event: InputEvent) => {
+                                    rule.tagName = (event.target as HTMLInputElement).value;
+                                    this.setting(anonymousUsersSettingKey)(JSON.stringify(anonymousUsers));
+                                },
+                            })),
+                            m('td', m('input.FormControl', {
+                                type: 'number',
+                                value: rule.userId || '',
+                                onchange: (event: InputEvent) => {
+                                    rule.userId = (event.target as HTMLInputElement).value;
+                                    this.setting(anonymousUsersSettingKey)(JSON.stringify(anonymousUsers));
+                                },
+                            })),
+                            m('td', m('input', {
+                                type: 'checkbox',
+                                checked: rule.isCreatingDiscussion,
+                                onchange: (event: InputEvent) => {
+                                    rule.isCreatingDiscussion = (event.target as HTMLInputElement).checked;
+                                    this.setting(anonymousUsersSettingKey)(JSON.stringify(anonymousUsers));
+                                },
+                            })),
+                            m('td', m('input', {
+                                type: 'checkbox',
+                                checked: rule.isCreatingPost,
+                                onchange: (event: InputEvent) => {
+                                    rule.isCreatingPost = (event.target as HTMLInputElement).checked;
+                                    this.setting(anonymousUsersSettingKey)(JSON.stringify(anonymousUsers));
+                                },
+                            })),
+                            m('td', m('input', {
+                                type: 'checkbox',
+                                checked: rule.isEnabled,
+                                onchange: (event: InputEvent) => {
+                                    rule.isEnabled = (event.target as HTMLInputElement).checked;
+                                    this.setting(anonymousUsersSettingKey)(JSON.stringify(anonymousUsers));
+                                },
+                            })),
+                            m('td', Button.component({
+                                className: 'Button Button--icon',
+                                icon: 'fas fa-times',
+                                onclick: () => {
+                                    anonymousUsers.splice(index, 1);
+
+                                    this.setting(anonymousUsersSettingKey)(anonymousUsers.length > 0 ? JSON.stringify(anonymousUsers) : null);
+                                },
+                            })),
+                        ])),
+                        m('tr', m('td', {
+                            colspan: 5,
+                        }, Button.component({
+                            className: 'Button Button--block',
+                            onclick: () => {
+                                anonymousUsers.push({
+                                    tagName: '',
+                                    userId: null,
+                                    isCreatingDiscussion: false,
+                                    isCreatingPost: false,
+                                    isEnabled: false,
+                                });
+
+                                this.setting(anonymousUsersSettingKey)(JSON.stringify(anonymousUsers));
+                            },
+                        }, app.translator.trans(translationPrefix + 'anonymousUserProfileByTagsAdd'))))
+                    ]),
+                ]),
+            ]);
         })
         .registerSetting(function (this: ExtensionPage) {
             let avatars: Avatar[];
