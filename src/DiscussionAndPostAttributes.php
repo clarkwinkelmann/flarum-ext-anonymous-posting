@@ -49,7 +49,7 @@ class DiscussionAndPostAttributes
 
     protected function avatarUrl(AbstractModel $model): ?string
     {
-        $avatarRules = json_decode($this->settings->get('anonymous-posting.formulaireAvatars'), true);
+        $avatarRules = json_decode((string)$this->settings->get('anonymous-posting.formulaireAvatars'), true);
 
         // Check if the setting has a value first to avoid degrading performance by retrieving a useless relationship
         // Also skip if Formulaire is not installed to avoid 500 error that would block access to the forum
